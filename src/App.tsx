@@ -3,23 +3,16 @@ import './App.css';
 import * as Interface from './interface/graphFx';
 import { AdjMatrix } from './input/adjMatrix';
 import DrawGraph from './display/drawGraph';
+import GraphFxAlgs from './processing/algorithms';
 
 function App() {  
-  const input = "";
+  const input = "0 1 1 1 1\n1 0 1 1 1\n1 1 0 1 1\n1 1 1 0 1\n1 1 1 1 0";
   const graph: Interface.GraphFx = new AdjMatrix(input);
-  for (let i = 0; i < graph.nodeList.length; i++) {
-    console.log(graph.nodeList[i].name);
-    for (let j = 0; j < graph.nodeList[i].in.length; j++) 
-      console.log('\t', graph.nodeList[i].in[j].end.name);
-    console.log('\n');
-    for (let j = 0; j < graph.nodeList[i].out.length; j++) 
-      console.log('\t', graph.nodeList[i].out[j].end.name);
-
-
-  }
+  const graphAlg: Interface.GraphFxAlgs = new GraphFxAlgs(graph);
+  
   return (
     <div>
-      <DrawGraph graph={graph} />
+      <DrawGraph graph={graphAlg.graph} />
 </div>
   );
 }

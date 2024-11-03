@@ -14,32 +14,9 @@ class AdjMatrix implements Interface.GraphFx {
     }
     
     create(input : string) : Interface.NodeFx[] {
+        console.log(input);
         const rows = input.trim().split('\n');
         const nodeList: Interface.NodeFx[] = [];
-        //ПИШЕМ РК
-        // Проверка 0: не пустая матрица
-        console.log(input);
-        if (input === "") {
-            console.log('Матрица должна быть не пустой');
-            throw new Error('Матрица должна быть не пустой');
-        }
-        const expectedLength = rows.length;
-
-        // Проверка 1: матрица должна быть квадратной
-        if (!rows.every(row => row.split(' ').length === expectedLength)) {
-            console.log('Матрица должна быть квадратной');
-            throw new Error('Матрица должна быть квадратной');
-        }
-
-        // Проверка 2: все элементы матрицы должны быть числами
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i].split(' ').map(Number);
-            if (row.some(isNaN)) {
-                console.log('Все элементы матрицы должны быть числами');
-                throw new Error('Все элементы матрицы должны быть числами');
-            }
-        }
-
 
         for (let i = 0; i < rows.length; i++) {
             const node: Interface.NodeFx = {
@@ -67,6 +44,8 @@ class AdjMatrix implements Interface.GraphFx {
     }
 
 }
+
+//TODO дописать проверки ввода
 
 //TODO дописать export см graphFx
 export { AdjMatrix };
