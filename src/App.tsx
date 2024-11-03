@@ -1,25 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import * as Interface from './interface/graphFx';
+import { AdjMatrix } from './input/adjMatrix';
+import DrawGraph from './display/drawGraph';
 
-function App() {
+function App() {  
+  const input = "";
+  const graph: Interface.GraphFx = new AdjMatrix(input);
+  for (let i = 0; i < graph.nodeList.length; i++) {
+    console.log(graph.nodeList[i].name);
+    for (let j = 0; j < graph.nodeList[i].in.length; j++) 
+      console.log('\t', graph.nodeList[i].in[j].end.name);
+    console.log('\n');
+    for (let j = 0; j < graph.nodeList[i].out.length; j++) 
+      console.log('\t', graph.nodeList[i].out[j].end.name);
+
+
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <div>
+      <DrawGraph graph={graph} />
+</div>
   );
 }
 
