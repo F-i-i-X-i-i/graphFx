@@ -1,6 +1,10 @@
 type PointFx = {
     x : number;
     y : number;
+    SetX : Function;
+    SetY : Function;
+    GetX : Function;
+    GetY : Function;
 }
 
 type EdgeFx = {
@@ -24,7 +28,6 @@ interface GraphFx {
 interface GraphFxAlgs {
     graph : GraphFx;
 
-    calcCoordinates() : NodeFx[];
     
     dfs() : NodeFx[];
     //TODO добавить алгоритмы

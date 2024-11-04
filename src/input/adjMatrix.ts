@@ -22,7 +22,7 @@ class AdjMatrix implements Interface.GraphFx {
             const node: Interface.NodeFx = {
                 name: `Node ${i}`,
                 in: [],
-                out: []
+                out: [],
             };
             nodeList.push(node);
         }
