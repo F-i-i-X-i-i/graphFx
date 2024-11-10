@@ -14,7 +14,8 @@ class AdjMatrix implements Interface.GraphFx {
     }
     
     create(input : string) : Interface.NodeFx[] {
-        console.log(input);
+        //console.log(input);
+        console.log(new Error().stack);
         const rows = input.trim().split('\n');
         const nodeList: Interface.NodeFx[] = [];
 

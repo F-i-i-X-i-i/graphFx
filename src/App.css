@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.App {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  height: 100vh;
+}
+
+.sidebar {
+  background-color: #f0f0f0;
+  padding: 20px;
+  overflow-y: auto;
+}
