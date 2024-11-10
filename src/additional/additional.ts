@@ -11,18 +11,5 @@ function coordsOnBorder(coord: number, maxCoord: number): number {
   }
 
 
-  function isNodeTooClose(nodes: Interface.NodeFx[], node: Interface.NodeFx, x: number, y: number, minDistance: number) {
-    // for (const otherNode of nodes) {
-    //   if (otherNode === node) continue;
-    //   const otherNodeX = otherNode.point?.GetX(otherNode);
-    //   const otherNodeY = otherNode.point?.GetY(otherNode);
-    //   const distance = Math.sqrt((x - otherNodeX) ** 2 + (y - otherNodeY) ** 2);
-    //   if (distance < minDistance) {
-    //     return true;
-    //   }
-    // }
-    return false;
-  }
-
-export { coordsOnBorder, isNodeTooClose };
+export { coordsOnBorder };
 

@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
-import { coordsOnBorder, isNodeTooClose } from "../additional/additional";
+import { coordsOnBorder } from "../additional/additional";
 
 const NODE_RADIUS = 20;
-const SVG_WIDTH = 800;
-const SVG_HEIGHT = 600;
 
-const DrawGraph: React.FC<{ graph: Interface.GraphFx }> = ({ graph }) => {
+const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: number }> = ({ graph, width, height }) => {
+  const SVG_WIDTH = width;
+  const SVG_HEIGHT = height;
   const [nodes, setNodes] = useState<Interface.NodeFx[]>([]);
   const edges = nodes.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -111,35 +111,43 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx }> = ({ graph }) => {
   }, [nodes]);
 
 
-  useEffect(() => {
-    if (svgRef.current) {
-      const svg = d3.select(svgRef.current);
-      const drag = d3.drag<SVGGElement, Interface.NodeFx>()
-        .on('start', (event, d) => {
-          console.log(d.name);
-          if (!d3.selectAll('.target').empty()) {
-            console.log('O NEEET TI NE PROUDESH')
-            return;
-          }
-          //console.log(nodes);
-          d3.select(event.sourceEvent.target.parentNode).raise();
-          d3.select(event.sourceEvent.target.parentNode)
-            .classed('target', true);
-        })
-        .on('drag', (event, d) => {
-          //console.log(nodes);
-            const x = d3.pointer(event)[0];
-            const y = d3.pointer(event)[1];          
-            //console.log(d.point?.x, d.point?.y, ' -> ', x, y);
-            //console.log(isNodeTooClose(nodes, d, x, y, 2*NODE_RADIUS));
-            //console.log(nodes);
-            if (!isNodeTooClose(nodes, d, x, y, 2*NODE_RADIUS)) {
-              d.point?.SetX(d, x);
-              d.point?.SetY(d, y);
-              d3.select(event.sourceEvent.target.parentNode)
-                .attr('transform', `translate(${x}, ${y})`);
-            } else 
-              console.log('o schastue');
+const [dragging, setDragging] = useState(false);
+const [draggedNode, setDraggedNode] = useState<Interface.NodeFx | null>(null);
+
+useEffect(() => {
+  if (svgRef.current) {
+    const svg = d3.select(svgRef.current);
+
+    svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
+      .on('click', (event, d) => {
+        if (!dragging) {
+          console.log('click');
+          setDragging(true);
+          setDraggedNode(d);
+          d3.select(event.target.parentNode)
+            .classed('dragged', true);
+        } else if (dragging && draggedNode === d) {
+          console.log('endclick\n');
+          setDragging(false);
+          setDraggedNode(null);
+          d3.select(event.target.parentNode)
+            .classed('dragged', false);
+        }
+      });
+      if (dragging) 
+        svg.on('mousemove', (event_) => {
+          console.log(dragging, draggedNode);
+          if (dragging && draggedNode !== null) {
+            console.log('\tdragging')
+            const x = event_.clientX;
+            const y = event_.clientY;
+            if (draggedNode.point) {
+              draggedNode.point.SetX(draggedNode, x);
+              draggedNode.point.SetY(draggedNode, y);
+            }
+            console.log('o gore: ', d3.selectAll());
+            d3.selectAll('.dragged')
+              .attr('transform', `translate(${x}, ${y})`);
             // Update node position
             // Update edges position
             const edgeGroups = svg.selectAll<SVGGElement, Interface.EdgeFx>('g.edge');
@@ -156,17 +164,11 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx }> = ({ graph }) => {
               .attr('y2', (e) => {
                 return e.end.point?.GetY(e.end);
               });
-        })
-        .on('end', (event, d) => {
-          d3.select(event.sourceEvent.target.parentNode)
-            .classed('target', false);
+          }
         });
-      svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
-        .call(drag);
-    }
-  }, [nodes]);
-
-
+      else svg.on('mousemove', null);
+  }
+}, [nodes, dragging, draggedNode]);
 
   return <svg ref={svgRef} width={SVG_WIDTH} height={SVG_HEIGHT} />;
 };

@@ -16,7 +16,7 @@ function App() {
   
   return (
     <div>
-      <DrawGraph graph={graphAlg.graph} />
+      <DrawGraph graph={graphAlg.graph} width = {800} height = {600}/>
 </div>
   );
 }
