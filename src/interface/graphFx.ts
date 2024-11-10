@@ -21,14 +21,12 @@ type NodeFx = {
 }
 
 interface GraphFx {
-    readonly nodeList: NodeFx[];
+    nodeList: NodeFx[];
     create(input: string) : NodeFx[];
 }
 
 interface GraphFxAlgs {
     graph : GraphFx;
-
-    
     dfs() : NodeFx[];
     //TODO добавить алгоритмы
 }
