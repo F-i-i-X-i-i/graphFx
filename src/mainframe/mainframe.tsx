@@ -46,10 +46,13 @@ const Mainframe: React.FC<{}> = () => {
     const handleSendMatrix = () => {
       const error = checkMatrix(currInput);
       setError(error);
-      if (error === '') 
+      if (error === '') {
+        console.log(currInput);
         setInput(currInput);
-      else 
+      } else { 
         setShowError(true);
+        setError('');
+      }
     };
 
   //console.log(width, height);

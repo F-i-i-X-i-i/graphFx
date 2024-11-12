@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
-import { coordsOnBorder, rxSize } from "../additional/additional";
+import { rxSize } from "../additional/additional";
 
 
 const NODE_RADIUS = 20;

@@ -10,10 +10,10 @@ class AdjMatrix implements Interface.GraphFx {
 
     constructor(input ?: string) {
         this.nodeList = [];
-
+        console.log(input);
         if (input) 
-            this.create(input);
-        
+            this.nodeList = this.create(input);
+
         console.log(this.isDirected());
     }
 

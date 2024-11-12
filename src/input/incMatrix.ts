@@ -10,7 +10,7 @@ class IncMatrix implements Interface.GraphFx {
     constructor(input ?: string) {
         this.nodeList = [];
         if (input) 
-            this.create(input);
+            this.nodeList = this.create(input);
 
         console.log(this.isDirected());
     }
