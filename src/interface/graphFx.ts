@@ -23,6 +23,7 @@ type NodeFx = {
 interface GraphFx {
     nodeList: NodeFx[];
     create(input: string) : NodeFx[];
+    isDirected() : boolean;
 }
 
 interface GraphFxAlgs {

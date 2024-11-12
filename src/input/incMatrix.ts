@@ -6,11 +6,13 @@ import * as Interface from "../interface/graphFx"
 
 class IncMatrix implements Interface.GraphFx {
     readonly nodeList: Interface.NodeFx[];
+
     constructor(input ?: string) {
         this.nodeList = [];
-        if (input) {
-            this.nodeList = this.create(input);
-        }
+        if (input) 
+            this.create(input);
+
+        console.log(this.isDirected());
     }
 
     create(input : string) : Interface.NodeFx[] {
@@ -44,6 +46,18 @@ class IncMatrix implements Interface.GraphFx {
         return nodeList;
     }
 
+
+    isDirected(): boolean {
+        for (let i = 0; i < this.nodeList.length; i++) {
+            for (let j = i + 1; j < this.nodeList.length; j++) {
+                if (this.nodeList[i].out.find(edge => edge.end === this.nodeList[j]) &&
+                    !this.nodeList[j].out.find(edge => edge.end === this.nodeList[i])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
 //TODO дописать проверки ввода

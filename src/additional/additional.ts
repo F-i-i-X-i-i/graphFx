@@ -1,4 +1,3 @@
-import * as Interface from '../interface/graphFx';
 
 function coordsOnBorder(coord: number, maxCoord: number): number {
     if (coord <= 0) {
@@ -10,6 +9,12 @@ function coordsOnBorder(coord: number, maxCoord: number): number {
     }
   }
 
+  function rxSize(num: number): number {
+    const result = 20 + (Math.abs(num).toString().length - 1) * 10;
 
-export { coordsOnBorder };
+    return result;
+  }
+
+
+export { coordsOnBorder, rxSize };
 

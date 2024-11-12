@@ -1,11 +1,20 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
-import { coordsOnBorder } from "../additional/additional";
+import { coordsOnBorder, rxSize } from "../additional/additional";
 
 
 const NODE_RADIUS = 20;
-const TEXT_RADIUS= 10;
+
+const TEXT_RADIUS= 7;
+const TEXT_NODE_HEIGHT = 18;
+const TEXT_NODE_OFFSET = 8;
+const TEXT_NODE_WIDTH = 70;
+
+const TEXT_EDGE_HEIGHT = 18;
+const TEXT_Y_EDGE_OFFSET = TEXT_EDGE_HEIGHT / 2 - 2; //-2 потому что высота тыры пыры смещение все дела
+
+
 const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: number }> = ({ graph, width, height }) => {
   const SVG_WIDTH = width;
   const SVG_HEIGHT = height;
@@ -13,6 +22,22 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
   const edges = nodes.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
   const svgRef = useRef<SVGSVGElement>(null);
 
+  
+  const svg = d3.select(svgRef.current);
+  if (!svg.select('defs').node()) {
+    const marker = svg.append('defs')
+      .append('marker')
+      .attr('id', 'arrow')
+      .attr('markerWidth', 10)
+      .attr('markerHeight', 10)
+      .attr('refX', 20)
+      .attr('refY', 5)
+      .attr('orient', 'auto');
+
+    marker.append('path')
+      .attr('d', 'M 0 0 L 10 5 L 0 10 Z')
+      .attr('fill', 'black');
+  }
   useEffect(() => {
     console.log('1st\n');
     if (svgRef.current) svgRef.current.innerHTML = '';
@@ -56,8 +81,8 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
 
   useEffect(() => {
     //console.log('2st\n');
-
     if (svgRef.current) {
+
       const svg = d3.select(svgRef.current);
       // Render Edges
       const edgeGroups = svg.selectAll<SVGGElement, Interface.EdgeFx>('g.edge')
@@ -66,22 +91,38 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
         .append('g')
         .attr('class', 'edge');
         
-      edgeGroups.append('line')
+      if (graph.isDirected())
+        edgeGroups.append('line')
         .attr('stroke', 'black')
-        .attr('stroke-width', '2');
+        .attr('stroke-width', '2')
+        .attr('marker-end', 'url(#arrow)');
+      else
+        edgeGroups.append('line')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '2')
 
-      edgeGroups.append('circle')
-        .attr('cx', (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2)
-        .attr('cy', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2)
-        .attr('r', TEXT_RADIUS)
-        .attr('fill', 'white')
-        .attr('rx', 2);
+
+      edgeGroups.append('rect')
+        .attr("x", (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end) - rxSize(e.weight)) / 2)
+        .attr("y", (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end) - TEXT_EDGE_HEIGHT) / 2)
+        .attr("width", (e) => (rxSize(e.weight)))
+        .attr("height", TEXT_EDGE_HEIGHT)
+        .attr('stroke', 'gray')
+        .attr('stroke-width', '0.2')
+        .attr('rx', TEXT_RADIUS)
+        .attr('ry', TEXT_RADIUS)
+        .attr('opacity', 0.9)
+        .attr('fill', '#F7F7F7');
+
+
+
 
       edgeGroups.append('text')
         .attr('x', (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2)
-        .attr('y', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end) + 8) / 2)
+        .attr('y', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2 +  TEXT_Y_EDGE_OFFSET)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
+        .attr('font-size', `${TEXT_EDGE_HEIGHT}px`)
         .text((e) => e.weight);
       // Initialize edges
       edgeGroups.selectAll<SVGLineElement, Interface.EdgeFx>('line')
@@ -119,9 +160,23 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
         .attr('stroke', 'black')
         .attr('stroke-width', '2');
 
+      //TODO андрей предложил расчитывать положение подписи через центр svg посмотри в вк
+      nodeGroups.append('rect')
+        .attr('x', NODE_RADIUS + TEXT_NODE_OFFSET - TEXT_NODE_WIDTH / 2)
+        .attr('y', -NODE_RADIUS - TEXT_NODE_HEIGHT - TEXT_NODE_OFFSET)
+        .attr("width", TEXT_NODE_WIDTH)
+        .attr("height", TEXT_NODE_HEIGHT + 4)
+        .attr('stroke', 'gray')
+        .attr('stroke-width', '0.2')
+        .attr('rx', TEXT_RADIUS)
+        .attr('ry', TEXT_RADIUS)
+        .attr('opacity', 0.9)
+        .attr('fill', '#F2F2F2');
+
       nodeGroups.append('text')
-        .attr('x', NODE_RADIUS)
-        .attr('y', -NODE_RADIUS)
+        .attr('x', NODE_RADIUS + TEXT_NODE_OFFSET)
+        .attr('y', -NODE_RADIUS - TEXT_NODE_OFFSET)
+        .attr('font-size', `${TEXT_NODE_HEIGHT}px`)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
         .text((d) => d.name);
@@ -143,6 +198,7 @@ useEffect(() => {
 
     svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
       .on('click', (event, d) => {
+        //TODO вот тут прикол какой то происходит, см баг при перемешении где то в TODO было
         console.log('CLICK: ', dragging, draggedNode?.name, d.name);
         if (!dragging) {
           console.log('CLICKED');
@@ -201,17 +257,17 @@ useEffect(() => {
                 return e.end.point?.GetY(e.end);
               });
     
-                edgeGroups.selectAll<SVGCircleElement, Interface.EdgeFx>('circle')
+                edgeGroups.selectAll<SVGCircleElement, Interface.EdgeFx>('rect')
                   .filter((e) => e.start === draggedNode || e.end === draggedNode)
                   .classed('draggedEdge', true)
-                  .attr('cx', (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2)
-                  .attr('cy', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2);
+                  .attr("x", (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end) - rxSize(e.weight)) / 2)
+                  .attr("y", (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end) - TEXT_EDGE_HEIGHT) / 2)
     
     
                 edgeGroups.selectAll<SVGTextElement, Interface.EdgeFx>('text')
                   .filter((e) => e.start === draggedNode || e.end === draggedNode)
                   .attr('x', (e) => (e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2)
-                  .attr('y', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end) + 8) / 2);
+                  .attr('y', (e) => (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2 + TEXT_Y_EDGE_OFFSET);
                 
             animationFrameId = null;
           });
@@ -222,7 +278,7 @@ useEffect(() => {
   }
 }, [nodes, dragging, draggedNode]);
 
-return <svg style={{ border: '1px solid black' }} ref={svgRef} width={SVG_WIDTH} height={SVG_HEIGHT} />;
+return <svg style={{ userSelect: "none" }} ref={svgRef} width={SVG_WIDTH} height={SVG_HEIGHT} />;
 };
 
 export default DrawGraph;
