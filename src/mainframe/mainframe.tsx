@@ -47,11 +47,10 @@ const Mainframe: React.FC<{}> = () => {
       const error = checkMatrix(currInput);
       setError(error);
       if (error === '') {
-        console.log(currInput);
+        //console.log(currInput);
         setInput(currInput);
       } else { 
         setShowError(true);
-        setError('');
       }
     };
 
@@ -72,7 +71,7 @@ const Mainframe: React.FC<{}> = () => {
       <DrawGraph graph={graphAlg.graph} width={width * 0.8} height={height} />
       <div className="sidebar">
         <textarea className="Inputmatrix" value={currInput} onChange={(e) => setCurrInput(e.target.value)} placeholder="Введите матрицу смежности" />
-        <button onClick={handleSendMatrix}>Отправить</button>
+        <Button variant="success" onClick={handleSendMatrix}>Отправить</Button>
       </div>
     </div>
   );

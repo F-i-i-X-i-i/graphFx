@@ -1,6 +1,8 @@
 function checkMatrix(matrix: string): string {
     // Проверить, что матрица не пустая
-    if (matrix.length === 0) {
+    
+
+    if (matrix.length === 0 || matrix.split(' ').join('') === '') {
       return "Ошибка: матрица пустая.";
     }
   
@@ -8,7 +10,8 @@ function checkMatrix(matrix: string): string {
     const rows = matrix.split('\n');
     const cols = rows[0].split(' ').length;
     for (const row of rows) {
-      if (row.split(' ').length !== cols) {
+        console.log('\t', row.trim());
+      if (row.trim().split(' ').length !== cols) {
         return "Ошибка: матрица не квадратная.";
       }
     }

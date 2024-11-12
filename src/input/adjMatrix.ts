@@ -10,7 +10,7 @@ class AdjMatrix implements Interface.GraphFx {
 
     constructor(input ?: string) {
         this.nodeList = [];
-        console.log(input);
+        //console.log(input);
         if (input) 
             this.nodeList = this.create(input);
 
@@ -31,7 +31,7 @@ class AdjMatrix implements Interface.GraphFx {
             nodeList.push(node);
         }
         for (let i = 0; i < rows.length; i++) {
-            const row = rows[i].split(' ').map(Number);
+            const row = rows[i].trim().split(' ').map(Number);
             for (let j = 0; j < row.length; j++) {
                 if (row[j] > 0) {
                     const edge: Interface.EdgeFx = {
