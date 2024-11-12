@@ -1,0 +1,61 @@
+.field {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .sidebar {
+    width: 20%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-left: 1px solid #ccc;
+  }
+  
+  .sidebar input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+  }
+  
+  .sidebar button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+
+  .sidebar textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 100px;
+    height: auto;
+    display: block;
+    box-sizing: border-box;
+  }
+  
+  .sidebar button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+  }

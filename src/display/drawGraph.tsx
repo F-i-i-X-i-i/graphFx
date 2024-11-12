@@ -3,6 +3,7 @@ import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
 import { coordsOnBorder } from "../additional/additional";
 
+
 const NODE_RADIUS = 20;
 const TEXT_RADIUS= 10;
 const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: number }> = ({ graph, width, height }) => {
@@ -14,6 +15,7 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
 
   useEffect(() => {
     console.log('1st\n');
+    if (svgRef.current) svgRef.current.innerHTML = '';
     const calcCoordinates = (graph : Interface.GraphFx) : Interface.NodeFx[] => {
       const nodeList = graph.nodeList;
       const radius = 200; // радиус окружности
@@ -129,6 +131,8 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
 
 const [dragging, setDragging] = useState(false);
 const [draggedNode, setDraggedNode] = useState<Interface.NodeFx | null>(null);
+//TODO КАКАЯ ТО ОШИБКА ПРИ ПЕРЕМЕЩЕНИИ НОД, ОШИБКА В ВЫХОДЕ ИЗ РЕЖИМА (что-то типа вывод NODE 0 NODE 4)
+
 //console.log(dragging, draggedNode);
 useEffect(() => {
   //console.log('4st\n');

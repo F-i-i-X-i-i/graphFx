@@ -9,11 +9,10 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
     }
 
     
-    
     //TODO реализации алгоритмов
     dfs() : Interface.NodeFx[] {
         return this.graph.nodeList
     }
 }
 
-export default GraphFxAlgs;
+export { GraphFxAlgs };

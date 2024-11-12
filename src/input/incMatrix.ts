@@ -1,10 +1,10 @@
 //матрица смежности
-//TODO остальные способы ввода
+//TODO ДОДЕЛАТЬ
 
 import * as Interface from "../interface/graphFx"
 //я щас заплачу
 
-class AdjMatrix implements Interface.GraphFx {
+class IncMatrix implements Interface.GraphFx {
     readonly nodeList: Interface.NodeFx[];
     constructor(input ?: string) {
         this.nodeList = [];
@@ -26,7 +26,8 @@ class AdjMatrix implements Interface.GraphFx {
             };
             nodeList.push(node);
         }
-        for (let i = 0; i < rows.length; i++) {
+
+        for (let i = 0; i < rows[0].length; i++) {
             const row = rows[i].split(' ').map(Number);
             for (let j = 0; j < row.length; j++) {
                 if (row[j] === 1) {
@@ -47,4 +48,4 @@ class AdjMatrix implements Interface.GraphFx {
 
 //TODO дописать проверки ввода
 
-export { AdjMatrix };
+export { IncMatrix };
