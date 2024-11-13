@@ -2,16 +2,17 @@ function checkMatrix(matrix: string): string {
     // Проверить, что матрица не пустая
     
 
-    if (matrix.length === 0 || matrix.split(' ').join('') === '') {
+    if ((matrix.length === 0) || (matrix.split(' ').join('') === '')) {
       return "Ошибка: матрица пустая.";
     }
-  
+    
     // Проверить, что матрица квадратная
     const rows = matrix.split('\n');
     const cols = rows[0].split(' ').length;
     for (const row of rows) {
-        console.log('\t', row.trim());
-      if (row.trim().split(' ').length !== cols) {
+      console.log('\t\'', row.trim().split(' '), '\'');
+      if (row.trim().split(' ').length !== rows.length) {
+        console.log(row);
         return "Ошибка: матрица не квадратная.";
       }
     }

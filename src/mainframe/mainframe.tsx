@@ -23,7 +23,6 @@ const Mainframe: React.FC<{}> = () => {
     const [showError, setShowError] = useState(false);
 
     
-
     const closeError = () => {
       setShowError(false);
     };
@@ -56,6 +55,8 @@ const Mainframe: React.FC<{}> = () => {
 
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
+
+  //TODO переключатели между вводом матрицы смежности инцидентности и тд
   return (
     <div className="field">
       {showError && (
