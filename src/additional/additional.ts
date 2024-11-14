@@ -1,4 +1,7 @@
 
+
+import * as Interface from "../interface/graphFx";
+
 function coordsOnBorder(coord: number, maxCoord: number): number {
     if (coord <= 0) {
       return 1;
@@ -15,6 +18,20 @@ function coordsOnBorder(coord: number, maxCoord: number): number {
     return result;
   }
 
+  function getEdges(nodes: Interface.NodeFx[]): Interface.EdgeFx[] {
+    const edges: Interface.EdgeFx[] = [];
+    console.log(nodes);
+    nodes.forEach((node) => {
+      node.out.forEach((edge) => {
+        edges.push(edge);
+      });
+    });
+  
+    return edges;
+  }
 
-export { coordsOnBorder, rxSize };
+
+
+
+export { coordsOnBorder, rxSize, getEdges };
 

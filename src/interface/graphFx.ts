@@ -24,6 +24,7 @@ interface GraphFx {
     nodeList: NodeFx[];
     create(input: string) : NodeFx[];
     isDirected() : boolean;
+    calcCoordinates(SVG_WIDTH : number, SVG_HEIGHT : number) : void;
 }
 
 interface GraphFxAlgs {

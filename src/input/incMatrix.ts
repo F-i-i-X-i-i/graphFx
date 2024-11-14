@@ -12,7 +12,7 @@ class IncMatrix implements Interface.GraphFx {
         if (input) 
             this.nodeList = this.create(input);
 
-        console.log(this.isDirected());
+        //console.log(this.isDirected());
     }
 
     create(input : string) : Interface.NodeFx[] {
@@ -58,6 +58,10 @@ class IncMatrix implements Interface.GraphFx {
         }
         return false;
     }
+
+
+    calcCoordinates(SVG_WIDTH : number, SVG_HEIGHT : number) {}
+
 }
 
 //TODO дописать проверки ввода

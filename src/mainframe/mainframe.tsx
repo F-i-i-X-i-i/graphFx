@@ -5,7 +5,7 @@ import { AdjMatrix } from "../input/adjMatrix";
 import { GraphFxAlgs } from "../processing/algorithms";
 import "../css/sidebar.css";
 import "../css/errorMsg.css";
-import { Toast, ToastBody, Button } from 'react-bootstrap';
+import { Toast, Button } from 'react-bootstrap';
 import { checkMatrix } from "./checkers";
 
 
@@ -15,12 +15,13 @@ const Mainframe: React.FC<{}> = () => {
     const graph = useMemo(() => new AdjMatrix(input), [input]);
     const graphAlg = useMemo(() => new GraphFxAlgs(graph), [graph]);
 
-
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
 
     const [error, setError] = useState('');
     const [showError, setShowError] = useState(false);
+
+
 
     
     const closeError = () => {
@@ -28,6 +29,7 @@ const Mainframe: React.FC<{}> = () => {
     };
 
     useEffect(() => {
+      console.log("RESIZE");
       //console.log('APPs\n\n\n\n');
       const handleResize = () => {
         setWidth(window.innerWidth);
@@ -43,9 +45,12 @@ const Mainframe: React.FC<{}> = () => {
     }, []);
 
     const handleSendMatrix = () => {
+      console.log("HANDLE SEND MATRIX\n\n");
       const error = checkMatrix(currInput);
+      
       setError(error);
       if (error === '') {
+        setShowError(false);
         //console.log(currInput);
         setInput(currInput);
       } else { 
@@ -71,7 +76,7 @@ const Mainframe: React.FC<{}> = () => {
       )}
       <DrawGraph graph={graphAlg.graph} width={width * 0.8} height={height} />
       <div className="sidebar">
-        <textarea className="Inputmatrix" value={currInput} onChange={(e) => setCurrInput(e.target.value)} placeholder="Введите матрицу смежности" />
+        <textarea className="Inputmatrix" value={currInput} onChange={(e) => { console.log(e.target.value); setCurrInput(e.target.value)}} placeholder="Введите матрицу смежности" />
         <Button variant="success" onClick={handleSendMatrix}>Отправить</Button>
       </div>
     </div>

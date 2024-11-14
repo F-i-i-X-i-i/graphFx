@@ -8,11 +8,10 @@ function checkMatrix(matrix: string): string {
     
     // Проверить, что матрица квадратная
     const rows = matrix.split('\n');
-    const cols = rows[0].split(' ').length;
+    //const cols = rows[0].split(' ').length; !!! 
+    //TODO надо или нет
     for (const row of rows) {
-      console.log('\t\'', row.trim().split(' '), '\'');
       if (row.trim().split(' ').length !== rows.length) {
-        console.log(row);
         return "Ошибка: матрица не квадратная.";
       }
     }

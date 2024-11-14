@@ -50,15 +50,44 @@ class AdjMatrix implements Interface.GraphFx {
     isDirected(): boolean {
         for (let i = 0; i < this.nodeList.length; i++) {
             for (let j = i + 1; j < this.nodeList.length; j++) {
-                console.log('(', i, ';', j, '): ', this.nodeList[i].out.find(edge => edge.end === this.nodeList[j]));
-                console.log('(', i, ';', j, '): ', !this.nodeList[j].out.find(edge => edge.end === this.nodeList[i], '\n\n'));
-                if (this.nodeList[i].out.find(edge => edge.end === this.nodeList[j])  &&
-                    !this.nodeList[j].out.find(edge => edge.end === this.nodeList[i])) {
+                if (this.nodeList[i].out.find(edge => edge.end === this.nodeList[j])?.weight  !== this.nodeList[j].out.find(edge => edge.end === this.nodeList[i])?.weight
+                    ) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    calcCoordinates(SVG_WIDTH : number, SVG_HEIGHT : number) {
+        const nodeList = this.nodeList;
+        const radius = 200; // радиус окружности
+        const centerX = SVG_WIDTH / 2; // координата x центра окружности
+        const centerY = SVG_HEIGHT / 2; // координата y центра окружности
+        for (let i = 0; i < nodeList.length; i++) {
+          const angle = (2 * Math.PI * i) / nodeList.length; // угол для текущей вершины
+          const x = centerX + radius * Math.cos(angle); // координата x текущей вершины
+          const y = centerY + radius * Math.sin(angle); // координата y текущей вершины
+          nodeList[i].point = { 
+            x: x, 
+            y: y,
+            SetX: (d : Interface.NodeFx, x : number) => {
+              if (d.point) {
+                d.point.x = x;
+              }},
+            SetY: (d : Interface.NodeFx, y : number) => {
+              if (d.point) {
+                d.point.y = y;
+              }
+            },
+            GetX: (d : Interface.NodeFx) : number => {
+              return d.point? d.point.x : 0;
+            },
+            GetY: (d : Interface.NodeFx) : number => {
+              return  d.point? d.point.y : 0;
+            },
+          };
+        }
     }
 }
 
