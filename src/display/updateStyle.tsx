@@ -34,8 +34,8 @@ function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interfa
       .attr('stroke', (e) => NodeStyle[e.style]['stroke'])
       .attr('stroke-width', (e) => NodeStyle[e.style]['stroke-width'])
       .attr('stroke-dasharray', (e) => NodeStyle[e.style]['stroke-dasharray'])
-      .attr('fill', (e) => ((e.style === NodeStyleKey.GROUP && e.group) ? groupColors[e.group % groupColors.length] : NodeStyle[e.style]['fill']));
-    
+      .attr('fill', (e) => ((e.style === NodeStyleKey.GROUP && e.group) ? groupColors[e.group % groupColors.length] : NodeStyle[e.style]['fill']))
+      
       nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text')
       .attr('font-weight', (d) => NodeStyle[d.style]['font-weight']);
 

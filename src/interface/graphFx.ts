@@ -35,7 +35,7 @@ interface GraphFx {
 
 interface GraphFxAlgs {
     graph : GraphFx;
-    dijkstra(nameStart: NodeFx, nameEnd: NodeFx) : EdgeFx[];
+    dijkstra(nameStart: NodeFx, nameEnd: NodeFx) : string;
     connectedComponents() : void;
     //TODO добавить алгоритмы
 }

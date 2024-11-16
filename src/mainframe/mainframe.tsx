@@ -1,15 +1,15 @@
 import React, {useEffect, useMemo, useState} from "react";
-//import * as Interface from "../interface/graphFx"
+import * as Interface from "../interface/graphFx"
 import DrawGraph from "../display/drawGraph";
 import { AdjMatrix } from "../input/adjMatrix";
 import { GraphFxAlgs } from "../processing/algorithms";
-import * as Interface from "../interface/graphFx";
 import "../css/sidebar.css";
 import "../css/errorMsg.css";
 import { Toast, Button } from 'react-bootstrap';
 import { checkMatrix } from "./checkers";
 import Form from 'react-bootstrap/Form';
-
+import { NodeStyleKey } from "../styles/nodeStyle";
+import { EdgeStyleKey } from "../styles/edgeStyle";
 
 const Mainframe: React.FC<{}> = () => {
     const [currInput, setCurrInput] = useState("");
@@ -71,14 +71,23 @@ const Mainframe: React.FC<{}> = () => {
 
 
     const findPath = () => {
+      console.log('ПУТЬ');
+      const err = graphAlg.dijkstra(graphAlg.graph.nodeList[parseInt(selectedNode1)], graphAlg.graph.nodeList[parseInt(selectedNode2)]);
       
-      let path = graphAlg.dijkstra(graphAlg.graph.nodeList[parseInt(selectedNode1)], graphAlg.graph.nodeList[parseInt(selectedNode2)]);
-      console.log('path: ', path, '\n');
+      setError(err);
+      if (err !== '') 
+        setShowError(true);
       setTrigg(trigg + 1);
+
     };
 
     const showСonnСomps = () => {
-      graphAlg.connectedComponents();
+      console.log('КОМПОНЕНТЫ');
+      for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
+        graphAlg.graph.nodeList[i].style = NodeStyleKey.GROUP;
+      let edges = graphAlg.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+      for (let i = 0; i < edges.length; ++i) 
+          edges[i].style = EdgeStyleKey.DEFAULT;
       setTrigg(trigg + 1);
     }
   //console.log(width, height);
@@ -99,16 +108,16 @@ const Mainframe: React.FC<{}> = () => {
       )}
       <DrawGraph trigg = {trigg} graph={graphAlg.graph} width={width * 0.8} height={height} />
       <div className="sidebar">
-        <textarea className="Inputmatrix" value={currInput} onChange={(e) => { console.log(e.target.value); setCurrInput(e.target.value)}} placeholder="Введите матрицу смежности" />
+        <textarea className="Inputmatrix" value={currInput} onChange={(e) => { console.log(e.target.value); setCurrInput(e.target.value)}} placeholder="Введите матрицу смежности"  style = {{ marginBottom : '5px' }}/>
         <Button variant="success" onClick={handleSendMatrix}>Отправить</Button>
         <hr></hr>
-    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onChange={(e) => setSelectedNode1(e.target.value)}>
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onChange={(e) => setSelectedNode1(e.target.value)} style = {{ marginBottom : '5px' }}>
       <option selected>None</option>
       {graphAlg.graph.nodeList.map((node, i) => (
         <option key={i} value={i}>{node.name}</option>
       ))}
     </Form.Select>)}
-    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onChange={(e) => setSelectedNode2(e.target.value)}>
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onChange={(e) => setSelectedNode2(e.target.value)} style = {{ marginBottom : '5px' }}>
     <option selected>None</option>
       {graphAlg.graph.nodeList.map((node, i) => (
         <option key={i} value={i}>{node.name}</option>
@@ -117,7 +126,7 @@ const Mainframe: React.FC<{}> = () => {
     <Button variant="success" onClick={findPath}>Найти</Button>
     <hr></hr>
     <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
-
+    <hr></hr>
       </div>
     </div>
   );

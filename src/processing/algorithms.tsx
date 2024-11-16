@@ -11,15 +11,21 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
 
     constructor(graph : Interface.GraphFx) {
         this.graph = graph;
+        this.connectedComponents();
     }
 
     
     //TODO реализации алгоритмов
-    dijkstra(startNode: Interface.NodeFx, endNode: Interface.NodeFx) : Interface.EdgeFx[] {
+    dijkstra(startNode: Interface.NodeFx, endNode: Interface.NodeFx) : string {
 
         if (!startNode || !endNode) {
-            console.error('одна из нод - None');
-            return [];
+            console.error('одна из нод не указана');
+            return 'одна из вершин не указана';
+        }
+
+        if (startNode === endNode) {
+            startNode.style = NodeStyleKey.PATH;
+            return '';
         }
 
         const distances: { [key: string]: number } = {};
@@ -53,7 +59,7 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
         
         if (!previous[endNode.name]) {
             console.error('Пути не существует');
-            return [];
+            return 'Пути не существует';
         }
 
         const path: Interface.EdgeFx[] = [];
@@ -89,10 +95,11 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
         } 
         startNode.style = NodeStyleKey.PATH;
 
-        return path;
+        return '';
     }
 
     connectedComponents() : void {
+        console.log('CALC GROUPS');
         const graph = this.graph;
         const nodeList = graph.nodeList;
         const processedNodes: Interface.NodeFx[] = [];
@@ -112,12 +119,7 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
             processedNodes.push(...result_group);
         }
 
-        let edges = this.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
 
-        for (let i = 0; i < edges.length; ++i) 
-            edges[i].style = EdgeStyleKey.DEFAULT;
-        for (let i = 0; i <this.graph.nodeList.length; ++i) 
-            this.graph.nodeList[i].style = NodeStyleKey.GROUP;
 
         for (let i = 0; i < groups.length; ++i) 
             for (let j = 0; j < groups[i].length; ++j) 
