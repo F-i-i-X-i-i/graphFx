@@ -1,3 +1,6 @@
+import { EdgeStyleKey } from "../styles/edgeStyle";
+import { NodeStyleKey } from "../styles/nodeStyle";
+
 type PointFx = {
     x : number;
     y : number;
@@ -11,6 +14,7 @@ type EdgeFx = {
     start: NodeFx;
     end: NodeFx;
     weight: number;
+    style: EdgeStyleKey;
 }
 
 type NodeFx = {
@@ -18,6 +22,7 @@ type NodeFx = {
     out: EdgeFx[];
     name: string;
     point?: PointFx;
+    style: NodeStyleKey;
 }
 
 interface GraphFx {
@@ -29,7 +34,7 @@ interface GraphFx {
 
 interface GraphFxAlgs {
     graph : GraphFx;
-    dfs() : NodeFx[];
+    dijkstra(nameStart: NodeFx, nameEnd: NodeFx) : EdgeFx[];
     //TODO добавить алгоритмы
 }
 export type { EdgeFx, NodeFx, GraphFx, GraphFxAlgs, PointFx };

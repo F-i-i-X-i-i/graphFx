@@ -3,15 +3,18 @@ import React, {useEffect, useMemo, useState} from "react";
 import DrawGraph from "../display/drawGraph";
 import { AdjMatrix } from "../input/adjMatrix";
 import { GraphFxAlgs } from "../processing/algorithms";
+import * as Interface from "../interface/graphFx";
 import "../css/sidebar.css";
 import "../css/errorMsg.css";
 import { Toast, Button } from 'react-bootstrap';
 import { checkMatrix } from "./checkers";
+import Form from 'react-bootstrap/Form';
 
 
 const Mainframe: React.FC<{}> = () => {
     const [currInput, setCurrInput] = useState("");
     const [input, setInput] = useState("");
+    const [trigg, setTrigg] = useState(0);
     const graph = useMemo(() => new AdjMatrix(input), [input]);
     const graphAlg = useMemo(() => new GraphFxAlgs(graph), [graph]);
 
@@ -22,8 +25,6 @@ const Mainframe: React.FC<{}> = () => {
     const [showError, setShowError] = useState(false);
 
 
-
-    
     const closeError = () => {
       setShowError(false);
     };
@@ -44,6 +45,12 @@ const Mainframe: React.FC<{}> = () => {
 
     }, []);
 
+
+    useEffect(() => {
+      
+    }, [graph]);
+
+
     const handleSendMatrix = () => {
       console.log("HANDLE SEND MATRIX\n\n");
       const error = checkMatrix(currInput);
@@ -58,6 +65,17 @@ const Mainframe: React.FC<{}> = () => {
       }
     };
 
+
+    const [selectedNode1, setSelectedNode1] = useState<string>('');
+    const [selectedNode2, setSelectedNode2] = useState<string>('');
+
+
+    const findPath = () => {
+      
+      let path = graphAlg.dijkstra(graphAlg.graph.nodeList[parseInt(selectedNode1)], graphAlg.graph.nodeList[parseInt(selectedNode2)]);
+      console.log('path: ', path, '\n');
+      setTrigg(trigg + 1);
+    };
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
 
@@ -74,10 +92,25 @@ const Mainframe: React.FC<{}> = () => {
        </Toast.Body>
      </Toast>
       )}
-      <DrawGraph graph={graphAlg.graph} width={width * 0.8} height={height} />
+      <DrawGraph trigg = {trigg} graph={graphAlg.graph} width={width * 0.8} height={height} />
       <div className="sidebar">
         <textarea className="Inputmatrix" value={currInput} onChange={(e) => { console.log(e.target.value); setCurrInput(e.target.value)}} placeholder="Введите матрицу смежности" />
         <Button variant="success" onClick={handleSendMatrix}>Отправить</Button>
+        <hr></hr>
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onChange={(e) => setSelectedNode1(e.target.value)}>
+      <option selected>None</option>
+      {graphAlg.graph.nodeList.map((node, i) => (
+        <option key={i} value={i}>{node.name}</option>
+      ))}
+    </Form.Select>)}
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onChange={(e) => setSelectedNode2(e.target.value)}>
+    <option selected>None</option>
+      {graphAlg.graph.nodeList.map((node, i) => (
+        <option key={i} value={i}>{node.name}</option>
+      ))}
+    </Form.Select>)}
+    <Button variant="success" onClick={findPath}>Найти</Button>
+    
       </div>
     </div>
   );

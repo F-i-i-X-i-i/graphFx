@@ -2,6 +2,8 @@
 //TODO ДОДЕЛАТЬ
 
 import * as Interface from "../interface/graphFx"
+import { EdgeStyleKey } from "../styles/edgeStyle";
+import { NodeStyleKey } from "../styles/nodeStyle";
 //я щас заплачу
 
 class IncMatrix implements Interface.GraphFx {
@@ -25,6 +27,7 @@ class IncMatrix implements Interface.GraphFx {
                 name: `Node ${i}`,
                 in: [],
                 out: [],
+                style: NodeStyleKey.DEFAULT
             };
             nodeList.push(node);
         }
@@ -36,7 +39,8 @@ class IncMatrix implements Interface.GraphFx {
                     const edge: Interface.EdgeFx = {
                         start: nodeList[i],
                         end: nodeList[j],
-                        weight: 1 
+                        weight: 1,
+                        style: EdgeStyleKey.DEFAULT
                     };
                     nodeList[i].out.push(edge);
                     nodeList[j].in.push(edge);

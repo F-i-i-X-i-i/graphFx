@@ -37,7 +37,6 @@ function calcPointOnBezierCurve(e : Interface.EdgeFx, t : number, CURVE_OFFSET: 
   
     const x = (t - 1) * (t - 1) * x1 + 2 * t * (1 - t) * x2 + t * t * x3;
     const y = (t - 1) * (t - 1) * y1 + 2 * t * (1 - t) * y2 + t * t * y3;
-    console.log('IN TEXT: ', x, y);
     return [x, y];
   }
 

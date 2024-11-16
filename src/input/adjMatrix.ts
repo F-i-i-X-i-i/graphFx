@@ -2,6 +2,8 @@
 //TODO остальные способы ввода
 
 import * as Interface from "../interface/graphFx"
+import { EdgeStyleKey } from "../styles/edgeStyle";
+import { NodeStyleKey } from "../styles/nodeStyle";
 //я щас заплачу
 
 class AdjMatrix implements Interface.GraphFx {
@@ -27,6 +29,7 @@ class AdjMatrix implements Interface.GraphFx {
                 name: `Node ${i}`,
                 in: [],
                 out: [],
+                style: NodeStyleKey.DEFAULT
             };
             nodeList.push(node);
         }
@@ -37,7 +40,8 @@ class AdjMatrix implements Interface.GraphFx {
                     const edge: Interface.EdgeFx = {
                         start: nodeList[i],
                         end: nodeList[j],
-                        weight: row[j] 
+                        weight: row[j],
+                        style: EdgeStyleKey.DEFAULT
                     };
                     nodeList[i].out.push(edge);
                     nodeList[j].in.push(edge);

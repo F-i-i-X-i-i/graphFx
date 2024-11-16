@@ -21,7 +21,6 @@ function getLinePath(e : Interface.EdgeFx, isDirected : boolean, CURVE_OFFSET : 
     
     if (isDirected) {
       const [midX, midY] = calcMiddlePoint(e, CURVE_OFFSET);
-      console.log('IN LINE: ', midX, midY);
       return `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
     } else {
       return `M ${x1} ${y1} L ${x2} ${y2}`;
