@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
 import { rxSize, getEdges } from "../additional/additional";
-import { calcMiddlePoint, calcPointOnBezierCurve } from "./coords";
+import { calcMiddlePoint, calcCenterPoint } from "./coords";
 import { getLinePath } from "./getLinePath";
 
 const NODE_RADIUS = 20;
@@ -40,6 +40,7 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
       .attr('d', 'M 0 0 L 10 5 L 0 10 Z')
       .attr('fill', 'black');
   }
+  
   useEffect(() => {
     console.log('\tCALCULATE\n');
     d3.select(svgRef.current).selectAll('*').remove();
@@ -50,6 +51,7 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
 
   useEffect(() => {
     if (svgRef.current) {
+      console.log('\tEDGES\n');
     const svg = d3.select(svgRef.current);
 
       // Render Edges
@@ -65,15 +67,13 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
     .attr('stroke', 'black')
     .attr('stroke-width', '2')
     .attr('fill', 'none')
-    .attr('d', (d) => getLinePath(d, isDirected, CURVE_OFFSET))
+    .attr('d', (d) => getLinePath(d, isDirected, CURVE_OFFSET, NODE_RADIUS))
     .attr('marker-end', 'url(#arrow)');
 
 
       edgeGroups.append('rect')
-      // .attr("x", (e) => (calcMiddlePoint(e, CURVE_OFFSET)[0] - rxSize(e.weight) / 2))
-      // .attr("y", (e) => (calcMiddlePoint(e, CURVE_OFFSET)[1] - TEXT_EDGE_HEIGHT / 2))
-      .attr("x", (e) => (calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[0] - rxSize(e.weight) / 2))
-      .attr("y", (e) => (calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[1] - TEXT_EDGE_HEIGHT / 2))
+      .attr("x", (e) => (calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[0] - rxSize(e.weight) / 2))
+      .attr("y", (e) => (calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[1] - TEXT_EDGE_HEIGHT / 2))
         .attr("width", (e) => (rxSize(e.weight)))
         .attr("height", TEXT_EDGE_HEIGHT)
         .attr('stroke', 'gray')
@@ -84,26 +84,13 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
         .attr('fill', '#F7F7F7');
 
       edgeGroups.append('text')
-        .attr('x', (e) => calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[0])
-        .attr('y', (e) => calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[1] + TEXT_Y_EDGE_OFFSET)
+        .attr('x', (e) => calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[0])
+        .attr('y', (e) => calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[1] + TEXT_Y_EDGE_OFFSET)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
         .attr('font-size', `${TEXT_EDGE_HEIGHT}px`)
         .text((e) => e.weight);
-      // Initialize edges
-      // edgeGroups.selectAll<SVGLineElement, Interface.EdgeFx>('line')
-      //   .attr('x1', (e) => {
-      //     return e.start.point?.GetX(e.start);
-      //   })
-      //   .attr('y1', (e) => {
-      //     return e.start.point?.GetY(e.start);
-      //   })
-      //   .attr('x2', (e) => {
-      //     return e.end.point?.GetX(e.end);
-      //   })
-      //   .attr('y2', (e) => {
-      //     return e.end.point?.GetY(e.end);
-      //   });
+        
 
         svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').raise();
       }
@@ -111,9 +98,10 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
 
   useEffect(() => {
     if (svgRef.current) {
-      console.log('\t', graph.nodeList);
-      console.log('\t', edges);
-      console.log('\tRENDER\n');
+      console.log('\tNODES\n');
+      // console.log('\t', graph.nodeList);
+      // console.log('\t', edges);
+      // console.log('\tRENDER\n');
       const svg = d3.select(svgRef.current);
 
         
@@ -125,11 +113,11 @@ const DrawGraph: React.FC<{ graph: Interface.GraphFx, width : number, height: nu
         .attr('class', 'node')
         .attr('transform', (d) => `translate(${d.point?.GetX(d)}, ${d.point?.GetY(d)})`);
 
-      // nodeGroups.append('circle')
-      //   .attr('r', NODE_RADIUS)
-      //   .attr('fill', 'lightblue')
-      //   .attr('stroke', 'black')
-      //   .attr('stroke-width', '2');
+      nodeGroups.append('circle')
+        .attr('r', NODE_RADIUS)
+        .attr('fill', 'lightblue')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '2');
 
       //TODO андрей предложил расчитывать положение подписи через центр svg посмотри в вк
       nodeGroups.append('rect')
@@ -162,6 +150,7 @@ const [draggedNode, setDraggedNode] = useState<Interface.NodeFx | null>(null);
 useEffect(() => {
   //console.log('4st\n');
   if (svgRef.current) {
+    console.log('\tDRAG\n');
     const svg = d3.select(svgRef.current);
 
     let animationFrameId: number | null = null;
@@ -212,7 +201,7 @@ useEffect(() => {
             const edgeGroups = svg.selectAll<SVGGElement, Interface.EdgeFx>('g.edge');
             edgeGroups.selectAll<SVGPathElement, Interface.EdgeFx>('path')
               .filter((e) => e.start === draggedNode || e.end === draggedNode)
-              .attr('d', (e) => getLinePath(e, isDirected, CURVE_OFFSET));
+              .attr('d', (e) => getLinePath(e, isDirected, CURVE_OFFSET, NODE_RADIUS));
               // .attr('x1', (e) => {
               //   return e.start.point?.GetX(e.start);
               // })
@@ -228,14 +217,14 @@ useEffect(() => {
     
                 edgeGroups.selectAll<SVGCircleElement, Interface.EdgeFx>('rect')
                   .filter((e) => e.start === draggedNode || e.end === draggedNode)
-                  .attr("x", (e) => (calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[0] - rxSize(e.weight) / 2))
-                  .attr("y", (e) => (calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[1] - TEXT_EDGE_HEIGHT / 2))
+                  .attr("x", (e) => (calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[0] - rxSize(e.weight) / 2))
+                  .attr("y", (e) => (calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[1] - TEXT_EDGE_HEIGHT / 2))
     
     
                 edgeGroups.selectAll<SVGTextElement, Interface.EdgeFx>('text')
                   .filter((e) => e.start === draggedNode || e.end === draggedNode)
-                  .attr('x', (e) => calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[0])
-                  .attr('y', (e) => calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET)[1] + TEXT_Y_EDGE_OFFSET);
+                  .attr('x', (e) => calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[0])
+                  .attr('y', (e) => calcCenterPoint(e, isDirected, CURVE_OFFSET, NODE_RADIUS)[1] + TEXT_Y_EDGE_OFFSET);
                 
             animationFrameId = null;
           });

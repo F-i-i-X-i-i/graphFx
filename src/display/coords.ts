@@ -1,3 +1,4 @@
+import { off } from "process";
 import * as Interface from "../interface/graphFx";
 
 
@@ -40,4 +41,22 @@ function calcPointOnBezierCurve(e : Interface.EdgeFx, t : number, CURVE_OFFSET: 
     return [x, y];
   }
 
-export { calcMiddlePoint, calcPointOnBezierCurve  }
+function calcCenterPoint(e : Interface.EdgeFx, isDirected: boolean, CURVE_OFFSET: number, NODE_RADIUS : number) {
+  if (e.end === e.start) {
+    let offsetForLoop = 0;
+    if (isDirected) 
+      offsetForLoop = 15;
+    let di = (Math.sqrt(2)/2 + 1) * (offsetForLoop + NODE_RADIUS); 
+
+    return [e.start.point?.GetX(e.start) + di, e.start.point?.GetY(e.start)  + di]
+  }
+
+  if (isDirected) {
+    return calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET);
+  } else {
+    return [(e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2, (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2];
+  }
+}
+
+
+export { calcMiddlePoint, calcCenterPoint  }
