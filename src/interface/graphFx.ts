@@ -23,6 +23,7 @@ type NodeFx = {
     name: string;
     point?: PointFx;
     style: NodeStyleKey;
+    group?: number;
 }
 
 interface GraphFx {
@@ -35,6 +36,7 @@ interface GraphFx {
 interface GraphFxAlgs {
     graph : GraphFx;
     dijkstra(nameStart: NodeFx, nameEnd: NodeFx) : EdgeFx[];
+    connectedComponents() : void;
     //TODO добавить алгоритмы
 }
 export type { EdgeFx, NodeFx, GraphFx, GraphFxAlgs, PointFx };

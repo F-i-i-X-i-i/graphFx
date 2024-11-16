@@ -52,7 +52,7 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
         .attr('font-size', `${constant.TEXT_NODE_HEIGHT}px`)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
-        .attr('font-weight', (d) => EdgeStyle[d.style]['font-weight'])
+        .attr('font-weight', (d) => NodeStyle[d.style]['font-weight'])
         .text((d) => d.name);
     }
   }

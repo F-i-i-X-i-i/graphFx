@@ -76,6 +76,11 @@ const Mainframe: React.FC<{}> = () => {
       console.log('path: ', path, '\n');
       setTrigg(trigg + 1);
     };
+
+    const showСonnСomps = () => {
+      graphAlg.connectedComponents();
+      setTrigg(trigg + 1);
+    }
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
 
@@ -110,7 +115,9 @@ const Mainframe: React.FC<{}> = () => {
       ))}
     </Form.Select>)}
     <Button variant="success" onClick={findPath}>Найти</Button>
-    
+    <hr></hr>
+    <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
+
       </div>
     </div>
   );

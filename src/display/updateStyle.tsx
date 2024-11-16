@@ -4,9 +4,8 @@ import * as Interface from "../interface/graphFx";
 import * as d3 from 'd3';
 import { EdgeStyle, EdgeStyleKey } from "../styles/edgeStyle";
 import { NodeStyle, NodeStyleKey } from "../styles/nodeStyle";
-import { calcCenterPoint } from "./coords";
-import { getLinePath } from "./getLinePath";
-import { rxSize } from "../additional/additional";
+import { groupColors } from "../styles/groupColors";
+
 
 function resetNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
   if (svgRef.current) {
@@ -27,6 +26,7 @@ function resetEdgesStyle(svgRef: React.RefObject<SVGSVGElement>, edges: Interfac
 
 
 function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
+  
   if (svgRef.current) {
     const svg = d3.select(svgRef.current);
     const nodeGroups = svg.selectAll<SVGGElement, Interface.NodeFx>('g.node');
@@ -34,7 +34,7 @@ function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interfa
       .attr('stroke', (e) => NodeStyle[e.style]['stroke'])
       .attr('stroke-width', (e) => NodeStyle[e.style]['stroke-width'])
       .attr('stroke-dasharray', (e) => NodeStyle[e.style]['stroke-dasharray'])
-      .attr('fill', (e) => NodeStyle[e.style]['fill']);
+      .attr('fill', (e) => ((e.style === NodeStyleKey.GROUP && e.group) ? groupColors[e.group % groupColors.length] : NodeStyle[e.style]['fill']));
     
       nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text')
       .attr('font-weight', (d) => NodeStyle[d.style]['font-weight']);

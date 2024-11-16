@@ -3,6 +3,8 @@ import { start } from "repl";
 import * as Interface from "../interface/graphFx"
 import { EdgeStyleKey, EdgeStyle } from "../styles/edgeStyle";
 import { NodeStyleKey } from "../styles/nodeStyle";
+import { getTMinus, getTPlus, getIntersection } from "./funcForConnComps";
+
 
 class GraphFxAlgs implements Interface.GraphFxAlgs {
     readonly graph : Interface.GraphFx;
@@ -89,6 +91,40 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
 
         return path;
     }
+
+    connectedComponents() : void {
+        const graph = this.graph;
+        const nodeList = graph.nodeList;
+        const processedNodes: Interface.NodeFx[] = [];
+        const groups: Interface.NodeFx[][] = [];
+    
+        for (let i = 0; i < nodeList.length; ++i) {
+            if (processedNodes.includes(nodeList[i])) {
+                continue;
+            }
+    
+            const nodeListPlus = getTPlus(nodeList[i], this.graph);
+            const nodeListMinus = getTMinus(nodeList[i], this.graph);
+            const result_group = getIntersection(nodeListPlus, nodeListMinus);
+            console.warn(result_group);
+    
+            groups.push(result_group);
+            processedNodes.push(...result_group);
+        }
+
+        let edges = this.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+
+        for (let i = 0; i < edges.length; ++i) 
+            edges[i].style = EdgeStyleKey.DEFAULT;
+        for (let i = 0; i <this.graph.nodeList.length; ++i) 
+            this.graph.nodeList[i].style = NodeStyleKey.GROUP;
+
+        for (let i = 0; i < groups.length; ++i) 
+            for (let j = 0; j < groups[i].length; ++j) 
+                groups[i][j].group = i + 1;
+        //TODO мб лучше в конструкторе один раз вызвать и забыть, чтобы каждый раз не пересчитывать 
+        console.log(graph.nodeList);
+    }   
 }
 
 export { GraphFxAlgs };

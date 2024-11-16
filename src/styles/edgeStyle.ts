@@ -25,14 +25,14 @@ const EdgeStyle = {
         'font-weight': 'normal',
         'fill-rect': '#F7F7F7',
         'stroke-rect': 'gray',
-
-    }
+    },
+    
   }
 
 const enum EdgeStyleKey  {
     DEFAULT = 'DEFAULT',
     DRAGGING = 'DRAGGING',
-    PATH = 'PATH'
+    PATH = 'PATH',
 
 }
 

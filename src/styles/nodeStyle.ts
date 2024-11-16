@@ -26,13 +26,23 @@ const NodeStyle = {
         'fill-rect': '#F2F2F2',
         'stroke-rect': 'gray'
 
-    }
+    },
+    'GROUP' : {
+        'stroke': 'black', 
+        'stroke-width': '2', 
+        'fill': 'lightblue',
+        'stroke-dasharray': 'none',
+        'font-weight': 'normal',
+        'fill-rect': '#F2F2F2',
+        'stroke-rect': 'gray'
+    },
   }
 
 const enum NodeStyleKey  {
     DEFAULT = 'DEFAULT',
     DRAGGING = 'DRAGGING',
-    PATH = 'PATH'
+    PATH = 'PATH',
+    GROUP = 'GROUP'
 
 }
 
