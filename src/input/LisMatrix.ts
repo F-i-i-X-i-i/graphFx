@@ -1,28 +1,39 @@
 //матрица смежности
-//TODO ДОДЕЛАТЬ
+//TODO остальные способы ввода
 
 import * as Interface from "../interface/graphFx"
 import { EdgeStyleKey } from "../styles/edgeStyle";
 import { NodeStyleKey } from "../styles/nodeStyle";
 //я щас заплачу
 
-class IncMatrix implements Interface.GraphFx {
+class LisMatrix implements Interface.GraphFx {
     readonly nodeList: Interface.NodeFx[];
+
 
     constructor(input ?: string) {
         this.nodeList = [];
+        //console.log(input);
         if (input) 
             this.nodeList = this.create(input);
 
-        //console.log(this.isDirected());
+        console.log(this.isDirected());
     }
 
     create(input : string) : Interface.NodeFx[] {
-        //console.log(input);
-        const rows = input.trim().split('\n');
+        const rows = input.split('\n');
         const nodeList: Interface.NodeFx[] = [];
+        let NodeCount = 0;
+        for (let i = 0; i < rows.length; ++i){
+            const row = rows[i].split(' ');
+            const start = parseInt(row[0]);
+            const end = parseInt(row[1]);
+            if (start + 1 > NodeCount) 
+                NodeCount = start + 1;
+            if (end + 1 > NodeCount)
+                NodeCount = end + 1;
+        }
 
-        for (let i = 0; i < rows.length; i++) {
+        for (let i = 0; i < NodeCount; i++) {
             const node: Interface.NodeFx = {
                 name: `Node ${i}`,
                 in: [],
@@ -31,57 +42,39 @@ class IncMatrix implements Interface.GraphFx {
             };
             nodeList.push(node);
         }
-        const columns = rows[0].split(' ').map((_, i) => {
-            return rows.map(row => row.split(' ')[i]);
-          });
+        console.warn(nodeList);
 
-        console.warn('columns: ', columns);
+        for (let i = 0; i < rows.length; ++i){
+            const row = rows[i].split(' ');
+            const [start, end, weight] = [parseInt(row[0]), parseInt(row[1]), parseInt(row[2])];
+            console.log('\tstart = ', start, '; end = ', end);
+            const edge: Interface.EdgeFx = {
+                start: nodeList[start],
+                end: nodeList[end],
+                weight: weight,
+                style: EdgeStyleKey.DEFAULT
+            };
+            nodeList[start].out.push(edge);
+            nodeList[end].in.push(edge);
 
-        for (let i = 0; i < columns.length; i++) {
-            const col = columns[i].map(Number);
-            const indices = col.map((x, index) => x !== 0 ? index : null).filter(x => x !== null);
-            console.warn(indices);
-            if (indices.length !== 2) {
-                console.error('ОШИБКА ВВОДА');
-            } else {
-                
-                let [i1, i2] = indices;
-                if (i1 != null && i2 != null){
-                    if (col[i1] < 0) {
-                        let a = i2;
-                        i2 = i1;
-                        i1 = a;
-                    }
-                    const edge: Interface.EdgeFx = {
-                        start: nodeList[i1],
-                        end: nodeList[i2],
-                        weight: col[i2],
-                        style: EdgeStyleKey.DEFAULT
-                    };
-                    nodeList[i1].out.push(edge);
-                    nodeList[i2].in.push(edge);
-                } else {
-                    console.error('ОШИБКА ОПРЕДЛЕНИЯ i1 = ', i1, '; i2 = ', i2);
-                }
-            } 
             
         }
+
+
         return nodeList;
     }
-
 
     isDirected(): boolean {
         for (let i = 0; i < this.nodeList.length; i++) {
             for (let j = i + 1; j < this.nodeList.length; j++) {
-                if (this.nodeList[i].out.find(edge => edge.end === this.nodeList[j]) &&
-                    !this.nodeList[j].out.find(edge => edge.end === this.nodeList[i])) {
+                if (this.nodeList[i].out.find(edge => edge.end === this.nodeList[j])?.weight  !== this.nodeList[j].out.find(edge => edge.end === this.nodeList[i])?.weight
+                    ) {
                     return true;
                 }
             }
         }
         return false;
     }
-
 
     calcCoordinates(SVG_WIDTH : number, SVG_HEIGHT : number) {
         const nodeList = this.nodeList;
@@ -112,11 +105,9 @@ class IncMatrix implements Interface.GraphFx {
             },
           };
         }
-
     }
-
 }
 
 //TODO дописать проверки ввода
 
-export { IncMatrix };
+export { LisMatrix };
