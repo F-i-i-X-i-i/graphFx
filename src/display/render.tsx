@@ -54,6 +54,16 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
         .attr('fill', 'black')
         .attr('font-weight', (d) => NodeStyle[d.style]['font-weight'])
         .text((d) => d.name);
+
+      nodeGroups.append('text')
+        .classed('inCircle', true)
+        .attr('x', '0')
+        .attr('y', '9')
+        .attr('font-size', '30px')
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'black')
+        .attr('font-family', 'Menlo')
+        .attr('font-weight', 'bold')
     }
   }
 

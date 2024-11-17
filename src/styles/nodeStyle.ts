@@ -6,7 +6,8 @@ const NodeStyle = {
         'stroke-dasharray': 'none',
         'font-weight': 'normal',
         'fill-rect': '#F2F2F2',
-        'stroke-rect': 'gray'
+        'stroke-rect': 'gray',
+        'display-text-in-circle': 'None',
     },
     'DRAGGING'  : {
         'stroke': 'black', 
@@ -15,7 +16,8 @@ const NodeStyle = {
         'stroke-dasharray': '5,2',
         'font-weight': 'bold',
         'fill-rect': '#C0C0C0',
-        'stroke-rect': 'black'
+        'stroke-rect': 'black',
+        'display-text-in-circle': 'None',
     },
     'PATH' : {
         'stroke': '#700000', 
@@ -24,7 +26,8 @@ const NodeStyle = {
         'stroke-dasharray': 'none',
         'font-weight': 'normal',
         'fill-rect': '#F2F2F2',
-        'stroke-rect': 'gray'
+        'stroke-rect': 'gray',
+        'display-text-in-circle': 'None',
 
     },
     'GROUP' : {
@@ -34,15 +37,27 @@ const NodeStyle = {
         'stroke-dasharray': 'none',
         'font-weight': 'normal',
         'fill-rect': '#F2F2F2',
-        'stroke-rect': 'gray'
+        'stroke-rect': 'gray',
+        'display-text-in-circle': 'None',
     },
+    'ORDINAL' : {
+        'stroke': 'black', 
+        'stroke-width': '2', 
+        'fill': 'lightblue',
+        'stroke-dasharray': 'none',
+        'font-weight': 'normal',
+        'fill-rect': '#F2F2F2',
+        'stroke-rect': 'gray',
+        'display-text-in-circle': 'inline',
+    }
   }
 
 const enum NodeStyleKey  {
     DEFAULT = 'DEFAULT',
     DRAGGING = 'DRAGGING',
     PATH = 'PATH',
-    GROUP = 'GROUP'
+    GROUP = 'GROUP',
+    ORDINAL = 'ORDINAL'
 
 }
 

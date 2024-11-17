@@ -24,6 +24,15 @@ function resetEdgesStyle(svgRef: React.RefObject<SVGSVGElement>, edges: Interfac
   updateEdgesStyle(svgRef, edges, isDirected);
 }
 
+function updateNodeFill(e: Interface.NodeFx): string {
+  if (e.group != null && e.style === NodeStyleKey.GROUP)
+    return groupColors[e.group % groupColors.length];
+  else if (e.ordinalF != null && e.style === NodeStyleKey.ORDINAL)
+    return groupColors[e.ordinalF % groupColors.length];
+  else 
+    return NodeStyle[e.style]['fill'];
+}
+
 
 function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
   
@@ -34,10 +43,15 @@ function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interfa
       .attr('stroke', (e) => NodeStyle[e.style]['stroke'])
       .attr('stroke-width', (e) => NodeStyle[e.style]['stroke-width'])
       .attr('stroke-dasharray', (e) => NodeStyle[e.style]['stroke-dasharray'])
-      .attr('fill', (e) => ((e.style === NodeStyleKey.GROUP && e.group) ? groupColors[e.group % groupColors.length] : NodeStyle[e.style]['fill']))
+      .attr('fill', (e) => updateNodeFill(e));
       
       nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text')
       .attr('font-weight', (d) => NodeStyle[d.style]['font-weight']);
+
+      nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text.inCircle')
+      .attr('display', (d) => NodeStyle[d.style]['display-text-in-circle'])
+      .text((d) => d.ordinalF != null ? d.ordinalF.toString() : 'err');
+
 
       nodeGroups.selectAll<SVGCircleElement, Interface.NodeFx>('rect')
       .attr('fill', (d) => NodeStyle[d.style]['fill-rect'])

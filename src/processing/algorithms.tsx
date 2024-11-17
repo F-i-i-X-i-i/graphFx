@@ -4,14 +4,18 @@ import * as Interface from "../interface/graphFx"
 import { EdgeStyleKey, EdgeStyle } from "../styles/edgeStyle";
 import { NodeStyleKey } from "../styles/nodeStyle";
 import { getTMinus, getTPlus, getIntersection } from "./funcForConnComps";
-
+import { createAdjacencyMatrix, removeNodesFromAdjacencyMatrix, calculateLambdaK } from "./funcForFindOrdinalFunction";
 
 class GraphFxAlgs implements Interface.GraphFxAlgs {
     readonly graph : Interface.GraphFx;
+    readonly isDirected: boolean;
+    readonly ordinalError: string;
 
     constructor(graph : Interface.GraphFx) {
         this.graph = graph;
         this.connectedComponents();
+        this.isDirected = this.graph.isDirected();
+        this.ordinalError = this.findOrdinalFunction();
     }
 
     
@@ -127,6 +131,46 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
         //TODO мб лучше в конструкторе один раз вызвать и забыть, чтобы каждый раз не пересчитывать 
         console.log(graph.nodeList);
     }   
+
+
+    findOrdinalFunction(): string {
+        const graph = this.graph;
+        const nodeList = graph.nodeList;
+        let adjacencyMatrix = createAdjacencyMatrix(nodeList);
+
+        let k = 0;
+        let ordinalFunction: { [node: string]: number } = {};
+        console.log('MATRIX: ', adjacencyMatrix);
+        while (true) {
+            console.log('\n\tordinalFunction: ', ordinalFunction);
+            const lambdaK = calculateLambdaK(adjacencyMatrix);
+            console.log('\tlambdaK: ', lambdaK)
+            const nodesWithZeroLambdaK = nodeList.filter(node => lambdaK[node.name] === 0);
+
+            if (nodesWithZeroLambdaK.length === 0) {
+                return "Порядковой функции графа не существует";
+            }
+
+            const levelK = nodesWithZeroLambdaK.map(node => node.name);
+            for (let i = 0; i < levelK.length; ++i)
+                ordinalFunction[levelK[i]] = k;
+            
+
+            if (Object.keys(ordinalFunction).length === nodeList.length) break;
+
+            adjacencyMatrix = removeNodesFromAdjacencyMatrix(adjacencyMatrix, levelK);
+
+            k++;
+        }
+        console.log('\n\tordinalFunction: ', ordinalFunction);
+        for (let i = 0; i < nodeList.length; ++i) {
+            nodeList[i].ordinalF = ordinalFunction[nodeList[i].name];
+        }
+
+        return '';
+    }
+
+    
 }
 
 export { GraphFxAlgs };

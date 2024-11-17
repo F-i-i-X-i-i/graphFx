@@ -90,6 +90,22 @@ const Mainframe: React.FC<{}> = () => {
           edges[i].style = EdgeStyleKey.DEFAULT;
       setTrigg(trigg + 1);
     }
+
+    const showOrdinal = () => {
+      for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
+        graphAlg.graph.nodeList[i].style = NodeStyleKey.ORDINAL;
+      let edges = graphAlg.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+      for (let i = 0; i < edges.length; ++i) 
+          edges[i].style = EdgeStyleKey.DEFAULT;
+        
+
+      setError(graphAlg.ordinalError);
+      if (graphAlg.ordinalError !== '') 
+        setShowError(true);
+      else 
+        setTrigg(trigg + 1);
+
+    }
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
 
@@ -126,6 +142,8 @@ const Mainframe: React.FC<{}> = () => {
     <Button variant="success" onClick={findPath}>Найти</Button>
     <hr></hr>
     <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
+    <hr></hr>
+    {graphAlg.isDirected && (<Button variant="success" onClick={showOrdinal}>Показать уровни порядка</Button>)}
     <hr></hr>
       </div>
     </div>
