@@ -49,7 +49,17 @@ const NodeStyle = {
         'fill-rect': '#F2F2F2',
         'stroke-rect': 'gray',
         'display-text-in-circle': 'inline',
-    }
+    },
+    'SKELETON' : {
+        'stroke': 'black', 
+        'stroke-width': '2', 
+        'fill': '#FFA500',
+        'stroke-dasharray': 'none',
+        'font-weight': 'normal',
+        'fill-rect': '#F2F2F2',
+        'stroke-rect': 'gray',
+        'display-text-in-circle': 'None',
+    },
   }
 
 const enum NodeStyleKey  {
@@ -57,7 +67,8 @@ const enum NodeStyleKey  {
     DRAGGING = 'DRAGGING',
     PATH = 'PATH',
     GROUP = 'GROUP',
-    ORDINAL = 'ORDINAL'
+    ORDINAL = 'ORDINAL',
+    SKELETON = 'SKELETON',
 
 }
 

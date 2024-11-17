@@ -26,6 +26,15 @@ const EdgeStyle = {
         'fill-rect': '#F7F7F7',
         'stroke-rect': 'gray',
     },
+    'SKELETON' : {
+        'stroke': '#FFA500', 
+        'stroke-width': '2', 
+        'fill': 'none',
+        'stroke-dasharray': 'none',
+        'font-weight': 'normal',
+        'fill-rect': '#F7F7F7',
+        'stroke-rect': 'gray',
+    },
     
   }
 
@@ -33,6 +42,7 @@ const enum EdgeStyleKey  {
     DEFAULT = 'DEFAULT',
     DRAGGING = 'DRAGGING',
     PATH = 'PATH',
+    SKELETON = 'SKELETON',
 
 }
 

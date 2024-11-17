@@ -89,7 +89,7 @@ const Mainframe: React.FC<{}> = () => {
       for (let i = 0; i < edges.length; ++i) 
           edges[i].style = EdgeStyleKey.DEFAULT;
       setTrigg(trigg + 1);
-    }
+    };
 
     const showOrdinal = () => {
       for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
@@ -105,9 +105,35 @@ const Mainframe: React.FC<{}> = () => {
       else 
         setTrigg(trigg + 1);
 
-    }
+    };
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
+
+
+  const showMaxSkeleton = () => {
+    console.error('MAX SKELETON');
+    const err = graphAlg.findSkeletonTree('MAX');
+    setError(err);
+    if (err !== '') 
+      setShowError(true);
+    else
+      setTrigg(trigg + 1);
+
+  };
+
+  const showMinSkeleton = () => {
+    console.error('MIN SKELETON');
+    for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
+      console.error(graphAlg.graph.nodeList[i].style);
+    const err = graphAlg.findSkeletonTree('MIN');
+    setError(err);
+    if (err !== '') 
+      setShowError(true);
+    else
+      setTrigg(trigg + 1);
+    
+  };
+
 
   //TODO переключатели между вводом матрицы смежности инцидентности и тд
   return (
@@ -143,8 +169,21 @@ const Mainframe: React.FC<{}> = () => {
     <hr></hr>
     <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
     <hr></hr>
-    {graphAlg.isDirected && (<Button variant="success" onClick={showOrdinal}>Показать уровни порядка</Button>)}
-    <hr></hr>
+    {graphAlg.isDirected && (
+      <div>
+        <Button variant="success" onClick={showOrdinal}>Показать уровни порядка</Button>
+        <hr></hr>
+    </div>
+)}
+    
+    {!graphAlg.isDirected && ( 
+      <div>
+        <Button variant="success" style = {{ marginBottom : '5px' }} onClick={showMinSkeleton}>Показать остов минимального веса</Button>
+        <Button variant="success" onClick={showMaxSkeleton}>Показать остов максимального веса</Button>
+        <hr></hr>
+      </div>
+      )}
+      
       </div>
     </div>
   );

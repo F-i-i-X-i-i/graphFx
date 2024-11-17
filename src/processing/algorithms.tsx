@@ -5,15 +5,17 @@ import { EdgeStyleKey, EdgeStyle } from "../styles/edgeStyle";
 import { NodeStyleKey } from "../styles/nodeStyle";
 import { getTMinus, getTPlus, getIntersection } from "./funcForConnComps";
 import { createAdjacencyMatrix, removeNodesFromAdjacencyMatrix, calculateLambdaK } from "./funcForFindOrdinalFunction";
+import { additionToFull, getEdgeWithExtremalStepDistance } from "./funcForFindSkeletonTree";
 
 class GraphFxAlgs implements Interface.GraphFxAlgs {
     readonly graph : Interface.GraphFx;
     readonly isDirected: boolean;
     readonly ordinalError: string;
+    readonly isFullConnect: boolean;
 
     constructor(graph : Interface.GraphFx) {
         this.graph = graph;
-        this.connectedComponents();
+        this.isFullConnect = (this.connectedComponents().length === 1); 
         this.isDirected = this.graph.isDirected();
         this.ordinalError = this.findOrdinalFunction();
     }
@@ -102,7 +104,7 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
         return '';
     }
 
-    connectedComponents() : void {
+    connectedComponents() : Interface.NodeFx[][] {
         console.log('CALC GROUPS');
         const graph = this.graph;
         const nodeList = graph.nodeList;
@@ -130,6 +132,7 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
                 groups[i][j].group = i + 1;
         //TODO мб лучше в конструкторе один раз вызвать и забыть, чтобы каждый раз не пересчитывать 
         console.log(graph.nodeList);
+        return groups;
     }   
 
 
@@ -170,6 +173,57 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
         return '';
     }
 
+
+    findSkeletonTree(type: string): string {
+        if (type !== 'MIN' && type !== 'MAX') 
+          return 'Недопустимый тип остова';
+        
+        if (this.isDirected) 
+            return 'Граф ориентирован';
+
+        if (this.graph.nodeList.length === 0)
+            return 'Граф не содержит вершин';
+
+        if (!this.isFullConnect)
+            return 'Граф не связный';
+
+
+
+        const nodeList = this.graph.nodeList;
+        const X1: Interface.NodeFx[] = [nodeList[0]];
+        let X2: Interface.NodeFx[] = additionToFull(X1, nodeList);
+        const U1: Interface.EdgeFx[] = [];
+
+        
+        
+        while (X1.length !== nodeList.length && X2.length !== 0) {
+            const result = getEdgeWithExtremalStepDistance(X1, X2, type);
+            if (result !== undefined) {
+                const reverse = result.start.in.find((e) => e.start === result.end);
+                if (reverse === undefined) 
+                    return 'Не найдено обратное ребро';
+                U1.push(result);
+                U1.push(reverse);
+                X1.push(result.end);
+                X2 = additionToFull(X1, nodeList);
+            } else return 'На одном из шагов алгоритма не найдено ребро с экстремальным пошаговым расстоянием';
+        }
+            
+
+        let edges = this.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+        for (let i = 0; i <edges.length; ++i) 
+            edges[i].style = EdgeStyleKey.DEFAULT;
+        for (let i = 0; i <this.graph.nodeList.length; ++i) 
+            this.graph.nodeList[i].style = NodeStyleKey.DEFAULT;
+
+        for (let i = 0; i < X1.length; ++i) 
+            X1[i].style = NodeStyleKey.SKELETON;
+        for (let i = 0; i < U1.length; ++i) 
+            U1[i].style = EdgeStyleKey.SKELETON;
+
+        return '';
+    }
+    
     
 }
 

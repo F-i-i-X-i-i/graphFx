@@ -38,9 +38,11 @@ interface GraphFxAlgs {
     graph : GraphFx;
     isDirected : boolean;
     ordinalError : string;
+
     dijkstra(nameStart: NodeFx, nameEnd: NodeFx) : string;
     connectedComponents() : void;
     findOrdinalFunction() : string;
+    findSkeletonTree(type: string): string;
     //TODO добавить алгоритмы
 }
 export type { EdgeFx, NodeFx, GraphFx, GraphFxAlgs, PointFx };
