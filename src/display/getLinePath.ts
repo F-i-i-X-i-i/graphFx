@@ -19,7 +19,7 @@ function getLinePath(e : Interface.EdgeFx, isDirected : boolean, CURVE_OFFSET : 
     const y1 = e.start.point?.GetY(e.start);
     const y2 = e.end.point?.GetY(e.end);
     
-    if (isDirected) {
+    if (isDirected && e.end.out.find((d) => d.end === e.start)) {
       const [midX, midY] = calcMiddlePoint(e, CURVE_OFFSET);
       return `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
     } else {

@@ -50,7 +50,7 @@ function calcCenterPoint(e : Interface.EdgeFx, isDirected: boolean, CURVE_OFFSET
     return [e.start.point?.GetX(e.start) + di, e.start.point?.GetY(e.start)  + di]
   }
 
-  if (isDirected) {
+  if (isDirected && e.end.out.find((d) => d.end === e.start)) {
     return calcPointOnBezierCurve(e, 0.5, CURVE_OFFSET);
   } else {
     return [(e.start.point?.GetX(e.start) + e.end.point?.GetX(e.end)) / 2, (e.start.point?.GetY(e.start) + e.end.point?.GetY(e.end)) / 2];
