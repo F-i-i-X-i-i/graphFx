@@ -15,6 +15,8 @@ import { typeInput } from "./inputType";
 import type { EdgeType } from "./forListOfEdges";
 import { EdgesListToString } from "./forListOfEdges";
 import { LisMatrix } from "../input/LisMatrix";
+import "../css/mainframe.css";
+import { JsoMatrix } from "../input/JsoMatrix";
 
 const Mainframe: React.FC<{}> = () => {
     const [currInput, setCurrInput] = useState("");
@@ -22,6 +24,13 @@ const Mainframe: React.FC<{}> = () => {
     const [trigg, setTrigg] = useState(0);
     
     const [active, setActive] = useState<typeInput>(typeInput.ADJ);
+
+    const [file, setFile] = useState<File>();
+    const [currFile, setCurrFile] = useState<File | null>(null);
+
+
+    const [error, setError] = useState('');
+    const [showError, setShowError] = useState(false);
 
     const graph = useMemo(() => {
       console.error('ВВОД, ПЕРЕЗАПИСЬ GRAPH');
@@ -31,21 +40,24 @@ const Mainframe: React.FC<{}> = () => {
         case typeInput.INC:
           return new IncMatrix(input);
         case typeInput.LIS:
-          console.error('START');
-          console.error(input);
           return new LisMatrix(input);
+        case typeInput.JSO:
+          console.log('ВЫЗОВ КОНСТРУКТОРА');
+          return new JsoMatrix(input);
+          
         default:
           throw new Error('Неизвестный тип');
       }
-    }, [input]);
+    }, [input, file]);
 
-    const graphAlg = useMemo(() => new GraphFxAlgs(graph), [graph]);
+    const graphAlg = useMemo(() => {  
+      console.warn('ИНИЦИАЛИЗИРУЕМ ALGS: ', graph.nodeList);
+      
+      return new GraphFxAlgs(graph)}, [graph]);
 
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
 
-    const [error, setError] = useState('');
-    const [showError, setShowError] = useState(false);
 
 
     const closeError = () => {
@@ -113,6 +125,29 @@ const Mainframe: React.FC<{}> = () => {
           } else { 
             setShowError(true);
           }
+          break;
+        case typeInput.JSO:
+            if (!currFile)
+              error = 'Файл не указан'
+            setError(error);
+            if (currFile && !error) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                const fileContent = event.target?.result as string;
+                // код, который должен выполняться после чтения файла
+                console.log(fileContent);
+                setInput(fileContent);
+                console.warn(active);
+                CloseInputWindow();
+              };
+              reader.readAsText(currFile);
+            
+            console.warn(active);
+              CloseInputWindow();
+            } else { 
+              setShowError(true);
+            }
+            
           break;
         default:
             setError('Ошибка выбора типа ввода');
@@ -248,6 +283,31 @@ const Mainframe: React.FC<{}> = () => {
     setEdges(newEdges);
   };
 
+  const downloadGraph = () => {
+    
+    const graphData = JSON.stringify(graph, (key, value) => {
+      if (key === 'in' || key === 'out') {
+        return value.map((edge : Interface.EdgeFx) => ({
+          start: edge.start.name,
+          end: edge.end.name,
+          weight: edge.weight,
+          style: edge.style,
+        }));
+      }
+      return value;
+    });
+    const blob = new Blob([graphData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'graphFx.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+  };
+
+
+
   //TODO переключатели между вводом матрицы смежности инцидентности и тд
   return (
     <div className="field">
@@ -273,6 +333,7 @@ const Mainframe: React.FC<{}> = () => {
           <Button variant="outline-success" active={active === typeInput.ADJ} onClick={() => setActive(typeInput.ADJ)} children = {typeInput.ADJ}></Button>
           <Button variant="outline-success" active={active === typeInput.INC} onClick={() => setActive(typeInput.INC)} children = {typeInput.INC}></Button>
           <Button variant="outline-success" active={active === typeInput.LIS} onClick={() => setActive(typeInput.LIS)} children = {typeInput.LIS}></Button>
+          <Button variant="outline-success" active={active === typeInput.JSO} onClick={() => setActive(typeInput.JSO)} children = {typeInput.JSO}></Button>
         </ButtonGroup>
 
         <hr></hr>
@@ -332,13 +393,36 @@ const Mainframe: React.FC<{}> = () => {
             </div>
           </div>
         )}
+        {active === typeInput.JSO && (
+            <input
+              style = {{ marginBottom : '5px' }}
+              type="file"
+              id="fileInput"
+              accept=".json"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setCurrFile(e.target.files[0]);
+                }
+              }}
+            />
+        )}
           <Button variant="success" onClick={handleSendMatrix}>Отправить</Button>
           </Form>
         </Modal.Body>
         </Modal>
       )}
       <div className="sidebar">
+        <div style = {{ flexDirection : 'row', display: 'flex' }}>
         <Button variant="success" onClick={OpenInputWindow}>Ввод</Button>
+          <Button variant="btn btn-outline-secondary" style = {{ width: 'auto', marginLeft: '5px' }} onClick = {downloadGraph}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-download" viewBox="0 0 16 16">
+  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+</svg>
+          </Button>
+
+        </div>
+        
         
         <hr></hr>
 
@@ -375,6 +459,7 @@ const Mainframe: React.FC<{}> = () => {
       
       </div>
     </div>
+
   );
 }
 

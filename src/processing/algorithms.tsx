@@ -21,7 +21,6 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
     }
 
     
-    //TODO реализации алгоритмов
     dijkstra(startNode: Interface.NodeFx, endNode: Interface.NodeFx) : string {
 
         if (!startNode || !endNode) {

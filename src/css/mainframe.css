@@ -1,0 +1,7 @@
+.button-download {
+    visibility: hidden;
+}
+
+.button-download:hover {
+    visibility: visible;
+}
