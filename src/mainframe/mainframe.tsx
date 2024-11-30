@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useDeferredValue, useEffect, useMemo, useState} from "react";
 import * as Interface from "../interface/graphFx"
 import DrawGraph from "../display/drawGraph";
 import { AdjMatrix } from "../input/adjMatrix";
@@ -170,6 +170,10 @@ const Mainframe: React.FC<{}> = () => {
     const [selectedNode1, setSelectedNode1] = useState<string>('');
     const [selectedNode2, setSelectedNode2] = useState<string>('');
 
+    console.warn('RENDER');
+    const nodeOptions = graphAlg.graph.nodeList.map((node, i) => (
+        <option key={i} value={i}>{node.name}</option>
+      ));
 
     const findPath = () => {
       console.log('ПУТЬ');
@@ -234,7 +238,9 @@ const Mainframe: React.FC<{}> = () => {
       setTrigg(trigg + 1);
     
   };
-
+  useEffect (() => {
+    console.error('graph is changed');
+  }, [graph, graphAlg]);
 
 
   const [nodeCount, setNodeCount] = useState<number>(0);
@@ -318,7 +324,16 @@ const Mainframe: React.FC<{}> = () => {
     });
     
   };
+  const [nodeNameList, setNodeNameList] = useState(graphAlg.graph.nodeList.map((node, i) => (
+    <option key={i} value={i}>{node.name}</option>)));
 
+
+  const updateNodeNameList = () => {
+    console.log('focus');
+    setNodeNameList(graphAlg.graph.nodeList.map((node, i) => (
+      <option key={i} value={i}>{node.name}</option>
+    )));
+  } 
   //TODO переключатели между вводом матрицы смежности инцидентности и тд
   return (
     <div className="field">
@@ -381,17 +396,13 @@ const Mainframe: React.FC<{}> = () => {
                     <td>
                       <select className="form-control" value={edges[index].start} onChange={(e) => handleEdgeChange(index, 'start', parseInt(e.target.value))}>
                       <option value={undefined}>-</option>
-                        {Array(nodeCount).fill(0).map((_, nodeIndex) => (
-                          <option key={nodeIndex} value={nodeIndex}>{nodeIndex}</option>
-                        ))}
+                        {nodeOptions}
                       </select>
                     </td>
                     <td>
                       <select className="form-control" value={edges[index].end} onChange={(e) => handleEdgeChange(index, 'end', parseInt(e.target.value))}>
                       <option value={undefined} >-</option>
-                        {Array(nodeCount).fill(0).map((_, nodeIndex) => (
-                          <option key={nodeIndex} value={nodeIndex}>{nodeIndex}</option>
-                        ))}
+                        {nodeOptions}
                       </select>
                     </td>
                     <td style = {{ width: '140px'}}>
@@ -443,17 +454,13 @@ const Mainframe: React.FC<{}> = () => {
         
         <hr></hr>
 
-    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onChange={(e) => setSelectedNode1(e.target.value)} style = {{ marginBottom : '5px' }}>
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onMouseOver={updateNodeNameList} onChange={(e) => setSelectedNode1(e.target.value)} style = {{ marginBottom : '5px' }}>
       <option selected>None</option>
-      {graphAlg.graph.nodeList.map((node, i) => (
-        <option key={i} value={i}>{node.name}</option>
-      ))}
+      {nodeNameList}
     </Form.Select>)}
-    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onChange={(e) => setSelectedNode2(e.target.value)} style = {{ marginBottom : '5px' }}>
+    {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onMouseOver={updateNodeNameList} onChange={(e) => setSelectedNode2(e.target.value)} style = {{ marginBottom : '5px' }}>
     <option selected>None</option>
-      {graphAlg.graph.nodeList.map((node, i) => (
-        <option key={i} value={i}>{node.name}</option>
-      ))}
+      {nodeNameList}
     </Form.Select>)}
     <Button variant="success" onClick={findPath}>Найти</Button>
     <hr></hr>

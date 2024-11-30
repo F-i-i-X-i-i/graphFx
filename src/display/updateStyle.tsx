@@ -45,8 +45,9 @@ function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interfa
       .attr('stroke-dasharray', (e) => NodeStyle[e.style]['stroke-dasharray'])
       .attr('fill', (e) => updateNodeFill(e));
       
-      nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text')
-      .attr('font-weight', (d) => NodeStyle[d.style]['font-weight']);
+      nodeGroups.selectAll<SVGForeignObjectElement, Interface.NodeFx>('foreignObject')
+      .selectAll<HTMLElement, Interface.NodeFx>('div')
+      .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${NodeStyle[e.style]['font-weight']}`);
 
       nodeGroups.selectAll<SVGTextElement, Interface.NodeFx>('text.inCircle')
       .attr('display', (d) => NodeStyle[d.style]['display-text-in-circle'])
@@ -68,8 +69,9 @@ function updateEdgesStyle(svgRef: React.RefObject<SVGSVGElement>, edges: Interfa
       .attr('stroke-width', (d) => EdgeStyle[d.style]['stroke-width'])
       .attr('stroke-dasharray', (d) => EdgeStyle[d.style]['stroke-dasharray'])
       .attr('fill', (d) => EdgeStyle[d.style]['fill']);
-      edgeGroups.selectAll<SVGTextElement, Interface.EdgeFx>('text')
-      .attr('font-weight', (d) => EdgeStyle[d.style]['font-weight']);
+      edgeGroups.selectAll<SVGForeignObjectElement, Interface.EdgeFx>('foreignObject')
+      .selectAll<HTMLElement, Interface.EdgeFx>('div')
+      .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${EdgeStyle[e.style]['font-weight']}`);
       edgeGroups.selectAll<SVGRectElement, Interface.EdgeFx>('rect')
       .attr('stroke', (d) => EdgeStyle[d.style]['stroke-rect'])
       .attr('fill', (d) => EdgeStyle[d.style]['fill-rect']);

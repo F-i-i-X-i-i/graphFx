@@ -70,7 +70,7 @@ useEffect(() => {
 
     let animationFrameId: number | null = null;
 
-    svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
+    svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').select('circle')
       .on('click', (event, d) => {
         resetEdgesStyle(svgRef, edges, isDirected);
         resetNodesStyle(svgRef, graph.nodeList);
@@ -135,10 +135,10 @@ useEffect(() => {
                   .attr("y", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2))
     
     
-                edgeGroups.selectAll<SVGTextElement, Interface.EdgeFx>('text')
+                edgeGroups.selectAll<SVGForeignObjectElement, Interface.EdgeFx>('ForeignObject')
                   .filter((e) => e.start === draggedNode || e.end === draggedNode)
-                  .attr('x', (e) => calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0])
-                  .attr('y', (e) => calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] + constant.TEXT_Y_EDGE_OFFSET);
+                  .attr("x", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(e.weight) / 2))
+                  .attr("y", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2))
                 
             animationFrameId = null;
           });

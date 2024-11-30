@@ -7,6 +7,7 @@ import { calcCenterPoint } from "./coords";
 import { getLinePath } from "./getLinePath";
 import { rxSize } from "../additional/additional";
 import { NodeStyle, NodeStyleKey } from "../styles/nodeStyle";
+import { checkWeight, uniqName } from "../additional/checkRedact";
 
 
 function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.GraphFx) {
@@ -46,14 +47,31 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
         .attr('opacity', 0.9)
         .attr('fill', (d) => NodeStyle[d.style]['fill-rect']);
 
-      nodeGroups.append('text')
-        .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET)
-        .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_OFFSET)
-        .attr('font-size', `${constant.TEXT_NODE_HEIGHT}px`)
-        .attr('text-anchor', 'middle')
-        .attr('fill', 'black')
-        .attr('font-weight', (d) => NodeStyle[d.style]['font-weight'])
-        .text((d) => d.name);
+
+
+        nodeGroups.append('foreignObject')
+  .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - constant.TEXT_NODE_WIDTH / 2)
+  .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET)
+  .attr('width', constant.TEXT_NODE_WIDTH)
+  .attr('height', constant.TEXT_NODE_HEIGHT + 4)
+  .append('xhtml:div')
+  .attr('contentEditable', 'true')
+  .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${NodeStyle[e.style]['font-weight']}`)
+  .text((d) => d.name)
+  .on('blur', (event, d) => {
+    d.name  = uniqName(event.target.textContent, d, graph.nodeList);
+    event.target.textContent = d.name;
+    // обновляем данные
+    console.log(d);
+  });
+  //     nodeGroups.append('text')
+  //       .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET)
+  //       .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_OFFSET)
+  //       .attr('font-size', `${constant.TEXT_NODE_HEIGHT}px`)
+  //       .attr('text-anchor', 'middle')
+  //       .attr('fill', 'black')
+  //       .attr('font-weight', (d) => NodeStyle[d.style]['font-weight'])
+  //       .text((d) => d.name);
 
       nodeGroups.append('text')
         .classed('inCircle', true)
@@ -93,7 +111,7 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
     .attr("x", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(e.weight) / 2))
     .attr("y", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2))
       .attr("width", (e) => (rxSize(e.weight)))
-      .attr("height", constant.TEXT_EDGE_HEIGHT)
+      .attr("height", constant.TEXT_EDGE_HEIGHT + 4)
       .attr('stroke', 'gray')
       .attr('stroke-width', '0.2')
       .attr('rx', constant.TEXT_RADIUS)
@@ -101,14 +119,23 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
       .attr('opacity', 0.9)
       .attr('fill', (e) => EdgeStyle[e.style]['fill-rect']);
 
-    edgeGroups.append('text')
-      .attr('x', (e) => calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0])
-      .attr('y', (e) => calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] + constant.TEXT_Y_EDGE_OFFSET)
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'black')
-      .attr('font-size', `${constant.TEXT_EDGE_HEIGHT}px`)
-      .attr('font-weight', (e) => EdgeStyle[e.style]['font-weight'])
-      .text((e) => e.weight);
+    edgeGroups.append('foreignObject')
+    .attr("x", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(e.weight) / 2))
+    .attr("y", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2))
+      .attr("width", (e) => (rxSize(e.weight)))
+      .attr("height", constant.TEXT_EDGE_HEIGHT + 4)
+      .append('xhtml:div')
+      .attr('contentEditable', 'true')
+      .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${EdgeStyle[e.style]['font-weight']}`)
+      .text((d) => d.weight)
+      .on('blur', (event, d) => {
+        if (checkWeight(event.target.textContent)) 
+          d.weight = event.target.textContent;
+        event.target.textContent = d.weight;
+        // обновляем данные
+        console.log(d);
+      });
+
       
 
       svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').raise();
