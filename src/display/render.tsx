@@ -36,9 +36,9 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
 
       //TODO андрей предложил расчитывать положение подписи через центр svg посмотри в вк
       nodeGroups.append('rect')
-        .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - constant.TEXT_NODE_WIDTH / 2)
+        .attr('x', (d) => constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2)
         .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET)
-        .attr("width", constant.TEXT_NODE_WIDTH)
+        .attr("width", (d) => rxSize(d.name))
         .attr("height", constant.TEXT_NODE_HEIGHT + 4)
         .attr('stroke', (d) => NodeStyle[d.style]['stroke-rect'])
         .attr('stroke-width', '0.2')
@@ -50,9 +50,9 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
 
 
         nodeGroups.append('foreignObject')
-  .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - constant.TEXT_NODE_WIDTH / 2)
+  .attr('x', (d) => constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2)
   .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET)
-  .attr('width', constant.TEXT_NODE_WIDTH)
+  .attr('width', (d) => rxSize(d.name))
   .attr('height', constant.TEXT_NODE_HEIGHT + 4)
   .append('xhtml:div')
   .attr('contentEditable', 'true')
@@ -63,6 +63,17 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
     event.target.textContent = d.name;
     // обновляем данные
     console.log(d);
+    let rect = event.target.parentNode.parentNode.querySelector('rect');
+    let forObj = event.target.parentNode;
+    rect.style.width = rxSize(d.name);
+    forObj.style.width = rxSize(d.name);
+    rect.setAttribute("x", constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2);
+    rect.setAttribute("y", -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET);
+    forObj.setAttribute("x", constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2);
+    forObj.setAttribute("y", -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET);
+
+
+
   });
   //     nodeGroups.append('text')
   //       .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET)
@@ -129,9 +140,24 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
       .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${EdgeStyle[e.style]['font-weight']}`)
       .text((d) => d.weight)
       .on('blur', (event, d) => {
-        if (checkWeight(event.target.textContent)) 
-          d.weight = event.target.textContent;
+        let reverseEdge = edges.find(edge => edge.start === d.end && edge.end === d.start);
+        if (checkWeight(event.target.textContent)) {
+          if (reverseEdge)
+            reverseEdge.weight = parseInt(event.target.textContent);  
+          d.weight = parseInt(event.target.textContent);
+        }
         event.target.textContent = d.weight;
+        let rect = event.target.parentNode.parentNode.querySelector('rect');
+        let forObj = event.target.parentNode;
+        rect.style.width = rxSize(d.weight);
+        forObj.style.width = rxSize(d.weight);
+        rect.setAttribute("x", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(d.weight) / 2);
+        rect.setAttribute("y", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2);
+        forObj.setAttribute("x", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(d.weight) / 2);
+        forObj.setAttribute("y", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2);
+
+        //event.target.style.width = rxSize(d.weight);
+        
         // обновляем данные
         console.log(d);
       });

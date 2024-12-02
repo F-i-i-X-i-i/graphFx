@@ -12,11 +12,15 @@ function coordsOnBorder(coord: number, maxCoord: number): number {
     }
   }
 
-  function rxSize(num: number): number {
-    const result = 20 + (Math.abs(num).toString().length - 1) * 10;
+  function rxSize(num: number | string): number {
+    if (typeof num === 'number')
+      return 20 + (Math.abs(num).toString().length - 1) * 10;
+    else 
+      return 20 + (num.length - 1) * 10;
 
-    return result;
   }
+
+
 
   function getEdges(nodes: Interface.NodeFx[]): Interface.EdgeFx[] {
     const edges: Interface.EdgeFx[] = [];

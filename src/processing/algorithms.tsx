@@ -22,13 +22,19 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
 
     
     dijkstra(startNode: Interface.NodeFx, endNode: Interface.NodeFx) : string {
-
+        console.log(this.graph.nodeList);
         if (!startNode || !endNode) {
             console.error('одна из нод не указана');
             return 'одна из вершин не указана';
         }
 
         if (startNode === endNode) {
+
+            let edges = this.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+            for (let i = 0; i <edges.length; ++i) 
+                edges[i].style = EdgeStyleKey.DEFAULT;
+            for (let i = 0; i <this.graph.nodeList.length; ++i) 
+                this.graph.nodeList[i].style = NodeStyleKey.DEFAULT;
             startNode.style = NodeStyleKey.PATH;
             return '';
         }
@@ -42,13 +48,16 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
             previous[node.name] = null;
         });
 
+        console.log('step1: ', distances, ', ', previous);
+
+
         distances[startNode.name] = 0;
         queue.push(startNode);
 
         while (queue.length > 0) {
             const node = queue.shift() as Interface.NodeFx;
             if (node === endNode) {
-                break;
+                continue;
             }
 
             node.out.forEach((edge) => {
@@ -59,8 +68,9 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
                     queue.push(edge.end);
                 }
             });
+            console.log('step2: ', distances, ', ', previous);
         }
-
+        console.log(distances);
         
         if (!previous[endNode.name]) {
             console.error('Пути не существует');
@@ -75,6 +85,7 @@ class GraphFxAlgs implements Interface.GraphFxAlgs {
             edges[i].style = EdgeStyleKey.DEFAULT;
         for (let i = 0; i <this.graph.nodeList.length; ++i) 
             this.graph.nodeList[i].style = NodeStyleKey.DEFAULT;
+        
         let isDirected = this.graph.isDirected();
         while (node !== startNode) {
             const edge = previous[node.name];
