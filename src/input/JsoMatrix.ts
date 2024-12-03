@@ -150,6 +150,70 @@ class JsoMatrix implements Interface.GraphFx {
         };
       }
     }
+
+
+    addNode(nodeName: string): string {
+      
+      const newNode: Interface.NodeFx = {
+          name: nodeName,
+          in: [],
+          out: [],
+          style: NodeStyleKey.DEFAULT,
+      };
+
+      if (this.nodeList.some((node) => node.name === nodeName))
+        return 'Вершина с указанным именем уже существует.';
+      else {
+        this.nodeList.push(newNode);
+        return '';
+      }
+  }
+
+  removeNode(nodeName: string): string {
+      const index = this.nodeList.findIndex((node) => node.name === nodeName);
+      if (index !== -1) {
+          this.nodeList.splice(index, 1);
+
+          // Удалить все ребра, связанные с удаленным узлом
+          this.nodeList.forEach((node) => {
+              node.in = node.in.filter((edge) => edge.start.name !== nodeName);
+              node.out = node.out.filter((edge) => edge.end.name !== nodeName);
+          });
+          return '';
+      } else return 'Ошибка при удалении: вершина не найдена.';
+  }
+
+
+  addEdge(startNode: Interface.NodeFx, endNode: Interface.NodeFx, weight: number): string {
+    
+
+    if (weight <= 0) 
+      return 'Вес ребра должен быть натуральным числом.';
+
+    if (startNode && endNode) {
+        const newEdge: Interface.EdgeFx = {
+            start: startNode,
+            end: endNode,
+            weight: weight,
+            style: EdgeStyleKey.DEFAULT,
+        };
+
+        startNode.out.push(newEdge);
+        endNode.in.push(newEdge);
+        return '';
+    } else return 'Ребро не найдено.'
+}
+
+removeEdge(startNode: Interface.NodeFx, endNode: Interface.NodeFx): string {
+
+
+
+    if (startNode && endNode) {
+        startNode.out = startNode.out.filter((edge) => edge.end !== endNode);
+        endNode.in = endNode.in.filter((edge) => edge.start !== startNode);
+        return '';
+    } else return 'Ребро не найдено.'
+}
   }
   
   //TODO дописать проверки ввода

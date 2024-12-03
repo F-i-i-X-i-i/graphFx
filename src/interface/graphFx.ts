@@ -32,6 +32,11 @@ interface GraphFx {
     create(input: string) : NodeFx[];
     isDirected() : boolean;
     calcCoordinates(SVG_WIDTH : number, SVG_HEIGHT : number) : void;
+    addNode(nodeName: string) : string;
+    removeNode(nodeName: string) : string;
+    addEdge(startNodeName : NodeFx, endNodeName : NodeFx, weight: number) : string;
+    removeEdge(startNodeName : NodeFx, endNodeName : NodeFx) : string;
+    
 }
 
 interface GraphFxAlgs {

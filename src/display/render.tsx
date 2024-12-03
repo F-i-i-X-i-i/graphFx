@@ -10,7 +10,8 @@ import { NodeStyle, NodeStyleKey } from "../styles/nodeStyle";
 import { checkWeight, uniqName } from "../additional/checkRedact";
 
 
-function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.GraphFx) {
+function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
+  console.log(nodes);
   if (svgRef.current) {
       console.log('\tNODES\n');
       // console.log('\t', graph.nodeList);
@@ -21,7 +22,7 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
         
       // Render Nodes
       const nodeGroups = svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
-        .data(graph.nodeList)
+        .data(nodes)
         .enter()
         .append('g')
         .attr('class', 'node')
@@ -59,7 +60,7 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
   .attr('style', (e) => `font-size: 14px; text-align: center; font-weight: ${NodeStyle[e.style]['font-weight']}`)
   .text((d) => d.name)
   .on('blur', (event, d) => {
-    d.name  = uniqName(event.target.textContent, d, graph.nodeList);
+    d.name  = uniqName(event.target.textContent, d, nodes);
     event.target.textContent = d.name;
     // обновляем данные
     console.log(d);
@@ -96,11 +97,11 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, graph: Interface.Gr
     }
   }
 
-function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.EdgeFx[], isDirected: boolean) {
+function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.EdgeFx[], graph: Interface.GraphFx) {
   if (svgRef.current) {
     console.log('\tEDGES: ', edges, '\n');
   const svg = d3.select(svgRef.current);
-
+    const isDirected = graph.isDirected();
     // Render Edges
     const edgeGroups = svg.selectAll<SVGGElement, Interface.EdgeFx>('g.edge')
       .data(edges)
@@ -114,8 +115,10 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
   .attr('stroke', (d) => EdgeStyle[d.style]['stroke'])
   .attr('stroke-width', (d) => EdgeStyle[d.style]['stroke-width'])
   .attr('fill', (d) => EdgeStyle[d.style]['fill'])
-  .attr('d', (d) => getLinePath(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS))
-  .attr('marker-end', 'url(#arrow)');
+  .attr('d', (d) => getLinePath(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS));
+
+  if (isDirected)
+    edgeGroups.selectChild('path').attr('marker-end', 'url(#arrow)');
 
 
     edgeGroups.append('rect')
@@ -149,13 +152,14 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
         event.target.textContent = d.weight;
         let rect = event.target.parentNode.parentNode.querySelector('rect');
         let forObj = event.target.parentNode;
+        let path = event.target.parentNode.parentNode.querySelector('path');
         rect.style.width = rxSize(d.weight);
         forObj.style.width = rxSize(d.weight);
         rect.setAttribute("x", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(d.weight) / 2);
         rect.setAttribute("y", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2);
         forObj.setAttribute("x", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(d.weight) / 2);
         forObj.setAttribute("y", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2);
-
+        path.setAttribute("d", getLinePath(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS));
         //event.target.style.width = rxSize(d.weight);
         
         // обновляем данные

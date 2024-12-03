@@ -10,14 +10,17 @@ import { renderNodes, renderEdges } from "./render";
 import { updateEdgesStyle, updateNodesStyle, resetEdgesStyle, resetNodesStyle } from "./updateStyle";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 import { NodeStyleKey } from "../styles/nodeStyle";
+import { start } from "repl";
+import { render } from "@testing-library/react";
  //-2 потому что высота тыры пыры смещение все дела
 
 
 
-const DrawGraph: React.FC<{ trigg: number, graph: Interface.GraphFx, width : number, height: number }> = ({ trigg, graph, width, height }) => {
+const DrawGraph: React.FC<{ trigg: number, update : number, graph: Interface.GraphFx, width : number, height: number }> = ({ trigg, update, graph, width, height }) => {
   const SVG_WIDTH = width;
   const SVG_HEIGHT = height;
   const [edges, setEdges] = useState<Interface.EdgeFx[]>([]);
+  const [nodes, setNodes] = useState<Interface.NodeFx[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const isDirected = graph.isDirected();
   
@@ -38,32 +41,78 @@ const DrawGraph: React.FC<{ trigg: number, graph: Interface.GraphFx, width : num
   }
   
   useEffect(() => {
+    console.log(trigg);
     updateEdgesStyle(svgRef, edges, isDirected);
-    updateNodesStyle(svgRef, graph.nodeList);
+    updateNodesStyle(svgRef, nodes);
   }, [trigg]);
 
   useEffect(() => {
     console.log('\tCALCULATE\n');
     d3.select(svgRef.current).selectAll('*').remove();
     setEdges(graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []));
+    setNodes(graph.nodeList);
     graph.calcCoordinates(SVG_WIDTH, SVG_HEIGHT);
-  }, [graph]);
+  }, [graph, update]);
+
 
 
   useEffect(() => {
-    renderEdges(svgRef, edges, isDirected);
+    console.log('render Edge');
+    console.log(edges);
+    renderEdges(svgRef, edges, graph);
   }, [edges]);
 
   useEffect(() => {
-    renderNodes(svgRef, graph);
-  }, [graph.nodeList]);
+    console.log('render Node');
+    renderNodes(svgRef, nodes);
+  }, [nodes, update]);
+
+  // const [startNode, setStartNode] = useState<Interface.NodeFx | undefined>(undefined);
+  // const [endNode, setEndNode] = useState<Interface.NodeFx | undefined>(undefined);
+  let startNode : Interface.NodeFx | undefined = undefined;
+  let endNode : Interface.NodeFx | undefined = undefined;
 
 
+  useEffect(() => {
+    if (svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').select('circle')
+      .on('contextmenu', (event, d) => {
+        console.log(startNode, endNode);
+        event.preventDefault();
+        if (startNode === undefined) {
+          console.log('ВЫБРАЛИ НАЧАЛЬНУЮ НОДУ: ', d);
+          startNode = d;
+        } else if (endNode === undefined) {
+          console.log('ВЫБРАЛИ КОНЕЧНУЮ НОДУ: ', d);
+          endNode = d;  
+        }
+        console.log(startNode, endNode);
+        if (startNode !== undefined && endNode !== undefined) {
+          if (edges.find((edge) => edge.start === startNode && edge.end === endNode)) {
+          console.log('УДАЛИЛ РЕБРО');
+          graph.removeEdge(startNode, endNode);
+          } else {
+            console.log('ДОБАВИЛ РЕБРО');
+            graph.addEdge(startNode, endNode, 1);
+
+          }
+          d3.select(svgRef.current).selectAll('g.edge').remove();
+          console.log(graph.nodeList);
+          console.log(graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []));
+          setEdges(graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []));
+          startNode = undefined;
+          endNode = undefined;
+        }
+
+      })
+
+    }
+  }, [nodes, update, edges]);
 
 const [draggedNode, setDraggedNode] = useState<Interface.NodeFx | null>(null);
 
 useEffect(() => {
-  console.log('4st\n');
   if (svgRef.current) {
     console.log('\tDRAG\n');
     const svg = d3.select(svgRef.current);
@@ -73,7 +122,7 @@ useEffect(() => {
     svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').select('circle')
       .on('click', (event, d) => {
         resetEdgesStyle(svgRef, edges, isDirected);
-        resetNodesStyle(svgRef, graph.nodeList);
+        resetNodesStyle(svgRef, nodes);
         //TODO вот тут прикол какой то происходит, см баг при перемешении где то в TODO было
         console.log('CLICK: ', draggedNode?.name, d.name);
         if (draggedNode === null) {
@@ -90,7 +139,6 @@ useEffect(() => {
           for (let i = 0; i < edges.length; ++i)
             if (edges[i].start === d || edges[i].end === d) {
               edges[i].style = EdgeStyleKey.DRAGGING;
-              console.log('\t\tЯ РОДИЛСЯ\n\n\n');
             }
         } else if (draggedNode === d) {
           console.log('NO CLICKED');
@@ -107,7 +155,7 @@ useEffect(() => {
         }
 
         updateEdgesStyle(svgRef, edges, isDirected);
-        updateNodesStyle(svgRef, graph.nodeList);
+        updateNodesStyle(svgRef, nodes);
       });
     if (draggedNode !== null) 
     svg.on('mousemove', (event_) => {
@@ -147,9 +195,9 @@ useEffect(() => {
     }); 
     else svg.on('mousemove', null); 
   }
-}, [graph.nodeList, edges, draggedNode]);
+}, [nodes, edges, draggedNode]);
 
-return <svg style={{ userSelect: "none" }} ref={svgRef} width={SVG_WIDTH} height={SVG_HEIGHT} />;
+return <svg style={{ userSelect: "none" }} ref={svgRef} width={SVG_WIDTH} height={SVG_HEIGHT}/>;
 };
 
 export default DrawGraph;

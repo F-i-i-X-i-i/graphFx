@@ -93,6 +93,73 @@ class AdjMatrix implements Interface.GraphFx {
           };
         }
     }
+    
+    addNode(nodeName: string): string {
+      
+      const newNode: Interface.NodeFx = {
+          name: nodeName,
+          in: [],
+          out: [],
+          style: NodeStyleKey.DEFAULT,
+      };
+
+      if (this.nodeList.some((node) => node.name === nodeName))
+        return 'Вершина с указанным именем уже существует.';
+      else {
+        this.nodeList.push(newNode);
+        return '';
+      }
+  }
+
+  removeNode(nodeName: string): string {
+      const index = this.nodeList.findIndex((node) => node.name === nodeName);
+      console.log(this.nodeList);
+      console.log(nodeName);
+      if (index !== -1) {
+
+          // Удалить все ребра, связанные с удаленным узлом
+          this.nodeList.forEach((node) => {
+            console.log(node);
+              node.in = node.in.filter((edge) => edge.start.name !== nodeName);
+              console.log(node);
+              node.out = node.out.filter((edge) => edge.end.name !== nodeName);
+              console.log(node);
+          });
+          console.log(this.nodeList);
+          this.nodeList.splice(index, 1);
+          return '';
+      } else return 'Ошибка при удалении: вершина не найдена.';
+  }
+
+  addEdge(startNode: Interface.NodeFx, endNode: Interface.NodeFx, weight: number): string {
+    const edgeList = this.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
+      if (edgeList.find((edge) => edge.start === startNode && edge.end === endNode))
+        return 'Ребро уже существует.';
+
+      if (weight <= 0) 
+        return 'Вес ребра должен быть натуральным числом.';
+
+      if (startNode && endNode) {
+          const newEdge: Interface.EdgeFx = {
+              start: startNode,
+              end: endNode,
+              weight: weight,
+              style: EdgeStyleKey.DEFAULT,
+          };
+
+          startNode.out.push(newEdge);
+          endNode.in.push(newEdge);
+          return '';
+      } else return 'Ребро не найдено.'
+  }
+
+  removeEdge(startNode: Interface.NodeFx, endNode: Interface.NodeFx): string {
+      if (startNode && endNode) {
+          startNode.out = startNode.out.filter((edge) => edge.end !== endNode);
+          endNode.in = endNode.in.filter((edge) => edge.start !== startNode);
+          return '';
+      } else return 'Ребро не найдено.'
+  }
 }
 
 //TODO дописать проверки ввода

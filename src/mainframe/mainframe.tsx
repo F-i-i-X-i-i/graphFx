@@ -188,6 +188,7 @@ const Mainframe: React.FC<{}> = () => {
 
     const showСonnСomps = () => {
       console.log('КОМПОНЕНТЫ');
+      graphAlg.connectedComponents();
       for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
         graphAlg.graph.nodeList[i].style = NodeStyleKey.GROUP;
       let edges = graphAlg.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
@@ -327,13 +328,56 @@ const Mainframe: React.FC<{}> = () => {
   const [nodeNameList, setNodeNameList] = useState(graphAlg.graph.nodeList.map((node, i) => (
     <option key={i} value={i}>{node.name}</option>)));
 
-
   const updateNodeNameList = () => {
     console.log('focus');
     setNodeNameList(graphAlg.graph.nodeList.map((node, i) => (
       <option key={i} value={i}>{node.name}</option>
     )));
   } 
+
+
+  const [update, setUpdate] = useState<number>(0);
+
+  const [removeNodeName, setRemoveNodeName] = useState('');
+
+  //TODO починить тут баг с выбором элемента по умолчанию, лучше наверное его убрать вообще
+  
+  const removeNode = () => {
+    let err = 'Удаляемая вершина не выбрана.';
+    if (removeNodeName) {
+      console.error(removeNodeName);
+      err = graphAlg.graph.removeNode(graphAlg.graph.nodeList[parseInt(removeNodeName)].name);
+    }
+    setError(err);
+    if (err !== '') 
+      setShowError(true);
+    else {
+      setShowError(false);
+      setUpdate(update + 1);
+    }
+    updateNodeNameList();
+  }
+
+  const [addNodeName, setAddNodeName] = useState('');
+  const addNode = () => {
+    let err = 'Введите имя.';
+    if (addNodeName)
+      err = graphAlg.graph.addNode(addNodeName);
+
+    setError(err);
+    if (err !== '') 
+      setShowError(true);
+    else {
+      setShowError(false);
+      setUpdate(update + 1);
+    }
+    updateNodeNameList();
+
+  }
+
+
+
+
   //TODO переключатели между вводом матрицы смежности инцидентности и тд
   return (
     <div className="field">
@@ -347,7 +391,7 @@ const Mainframe: React.FC<{}> = () => {
        </Toast.Body>
      </Toast>
       )}
-      <DrawGraph trigg = {trigg} graph={graphAlg.graph} width={width * 0.8} height={height} />
+      <DrawGraph trigg = {trigg} update = {update} graph={graphAlg.graph} width={width * 0.8} height={height} />
 
       {showInputWindow && (
         <Modal show={showInputWindow} onHide={CloseInputWindow}><Modal.Header closeButton>
@@ -451,18 +495,30 @@ const Mainframe: React.FC<{}> = () => {
 
         </div>
         
-        
         <hr></hr>
 
+        <input type = 'text' style = {{marginBottom: '5px'}} value={addNodeName} onChange={(e)=> setAddNodeName(e.target.value)}></input>
+        <Button variant="success" onClick={addNode}>Добавить</Button>
+
+        <hr></hr>
+        <Form.Select aria-label="Default select example" value={removeNodeName} onMouseOver={updateNodeNameList} onChange={(e) => setRemoveNodeName(e.target.value)} style = {{ marginBottom : '5px' }}>
+      <option selected key = {-1} value = {undefined}>...</option>
+      {nodeNameList}
+    </Form.Select>
+    <Button variant="success" onClick = {removeNode}>Удалить</Button>
+
+
+      <hr></hr>
+
     {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode1} onMouseOver={updateNodeNameList} onChange={(e) => setSelectedNode1(e.target.value)} style = {{ marginBottom : '5px' }}>
-      <option selected>None</option>
+      <option selected key = {-1} value = {undefined}>...</option>
       {nodeNameList}
     </Form.Select>)}
     {selectedNode1 !== null && (<Form.Select aria-label="Default select example" value={selectedNode2} onMouseOver={updateNodeNameList} onChange={(e) => setSelectedNode2(e.target.value)} style = {{ marginBottom : '5px' }}>
-    <option selected>None</option>
+    <option selected key = {-1} value = {undefined}>...</option>
       {nodeNameList}
     </Form.Select>)}
-    <Button variant="success" onClick={findPath}>Найти</Button>
+    <Button variant="success" onClick={findPath}>Найти кратчайший путь</Button>
     <hr></hr>
     <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
     <hr></hr>
