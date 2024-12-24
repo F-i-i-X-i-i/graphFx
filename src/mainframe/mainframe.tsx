@@ -198,6 +198,8 @@ const Mainframe: React.FC<{}> = () => {
     };
 
     const showOrdinal = () => {
+      let err = graphAlg.findOrdinalFunction();
+
       for (let i = 0; i <graphAlg.graph.nodeList.length; ++i) 
         graphAlg.graph.nodeList[i].style = NodeStyleKey.ORDINAL;
       let edges = graphAlg.graph.nodeList.reduce((acc: Interface.EdgeFx[], node) => acc.concat(node.out), []);
@@ -205,12 +207,13 @@ const Mainframe: React.FC<{}> = () => {
           edges[i].style = EdgeStyleKey.DEFAULT;
         
 
-      setError(graphAlg.ordinalError);
-      if (graphAlg.ordinalError !== '') 
+      setError(err);
+      if (err !== '') 
         setShowError(true);
-      else 
+      else {
+        setShowError(false);
         setTrigg(trigg + 1);
-
+      }
     };
   //console.log(width, height);
   //console.log('APP', graphAlg.graph.nodeList.map(node => node.point));
@@ -522,14 +525,14 @@ const Mainframe: React.FC<{}> = () => {
     <hr></hr>
     <Button variant="success" onClick={showСonnСomps}>показать компоненты связности</Button>
     <hr></hr>
-    {graphAlg.isDirected && (
+    {graphAlg.graph.isDirected() && (
       <div>
         <Button variant="success" onClick={showOrdinal}>Показать уровни порядка</Button>
         <hr></hr>
     </div>
 )}
     
-    {!graphAlg.isDirected && ( 
+    {!graphAlg.graph.isDirected() && ( 
       <div>
         <Button variant="success" style = {{ marginBottom : '5px' }} onClick={showMinSkeleton}>Показать остов минимального веса</Button>
         <Button variant="success" onClick={showMaxSkeleton}>Показать остов максимального веса</Button>

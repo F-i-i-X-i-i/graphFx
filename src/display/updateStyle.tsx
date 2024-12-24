@@ -6,7 +6,6 @@ import { EdgeStyle, EdgeStyleKey } from "../styles/edgeStyle";
 import { NodeStyle, NodeStyleKey } from "../styles/nodeStyle";
 import { groupColors } from "../styles/groupColors";
 
-
 function resetNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
   if (svgRef.current) {
     for (let i = 0; i <nodes.length; ++i) 
@@ -14,7 +13,6 @@ function resetNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interfac
   }
   updateNodesStyle(svgRef, nodes);
 }
-
 
 function resetEdgesStyle(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.EdgeFx[], isDirected: boolean) {
   if (svgRef.current) {
@@ -32,7 +30,6 @@ function updateNodeFill(e: Interface.NodeFx): string {
   else 
     return NodeStyle[e.style]['fill'];
 }
-
 
 function updateNodesStyle(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.NodeFx[]) {
   
@@ -76,8 +73,7 @@ function updateEdgesStyle(svgRef: React.RefObject<SVGSVGElement>, edges: Interfa
       .attr('stroke', (d) => EdgeStyle[d.style]['stroke-rect'])
       .attr('fill', (d) => EdgeStyle[d.style]['fill-rect']);
   }
-    
+  
 }
-
 
   export { updateNodesStyle, updateEdgesStyle, resetNodesStyle, resetEdgesStyle }

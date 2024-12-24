@@ -14,13 +14,8 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.No
   console.log(nodes);
   if (svgRef.current) {
       console.log('\tNODES\n');
-      // console.log('\t', graph.nodeList);
-      // console.log('\t', edges);
-      // console.log('\tRENDER\n');
       const svg = d3.select(svgRef.current);
 
-        
-      // Render Nodes
       const nodeGroups = svg.selectAll<SVGGElement, Interface.NodeFx>('g.node')
         .data(nodes)
         .enter()
@@ -35,7 +30,6 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.No
         .attr('stroke-dasharray', (e) => NodeStyle[e.style]['stroke-dasharray'])
         .attr('fill', (e) => NodeStyle[e.style]['fill']);
 
-      //TODO андрей предложил расчитывать положение подписи через центр svg посмотри в вк
       nodeGroups.append('rect')
         .attr('x', (d) => constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2)
         .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_HEIGHT - constant.TEXT_NODE_OFFSET)
@@ -47,8 +41,6 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.No
         .attr('ry', constant.TEXT_RADIUS)
         .attr('opacity', 0.9)
         .attr('fill', (d) => NodeStyle[d.style]['fill-rect']);
-
-
 
         nodeGroups.append('foreignObject')
   .attr('x', (d) => constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET - rxSize(d.name) / 2)
@@ -62,7 +54,6 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.No
   .on('blur', (event, d) => {
     d.name  = uniqName(event.target.textContent, d, nodes);
     event.target.textContent = d.name;
-    // обновляем данные
     console.log(d);
     let rect = event.target.parentNode.parentNode.querySelector('rect');
     let forObj = event.target.parentNode;
@@ -76,15 +67,6 @@ function renderNodes(svgRef: React.RefObject<SVGSVGElement>, nodes: Interface.No
 
 
   });
-  //     nodeGroups.append('text')
-  //       .attr('x', constant.NODE_RADIUS + constant.TEXT_NODE_OFFSET)
-  //       .attr('y', -constant.NODE_RADIUS - constant.TEXT_NODE_OFFSET)
-  //       .attr('font-size', `${constant.TEXT_NODE_HEIGHT}px`)
-  //       .attr('text-anchor', 'middle')
-  //       .attr('fill', 'black')
-  //       .attr('font-weight', (d) => NodeStyle[d.style]['font-weight'])
-  //       .text((d) => d.name);
-
       nodeGroups.append('text')
         .classed('inCircle', true)
         .attr('x', '0')
@@ -101,15 +83,13 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
   if (svgRef.current) {
     console.log('\tEDGES: ', edges, '\n');
   const svg = d3.select(svgRef.current);
-    const isDirected = graph.isDirected();
-    // Render Edges
+  console.error(graph.nodeList);
+    let isDirected = graph.isDirected();
     const edgeGroups = svg.selectAll<SVGGElement, Interface.EdgeFx>('g.edge')
       .data(edges)
       .enter()
       .append('g')
       .attr('class', 'edge');
-      
-
       
   edgeGroups.append('path')
   .attr('stroke', (d) => EdgeStyle[d.style]['stroke'])
@@ -119,7 +99,6 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
 
   if (isDirected)
     edgeGroups.selectChild('path').attr('marker-end', 'url(#arrow)');
-
 
     edgeGroups.append('rect')
     .attr("x", (e) => (calcCenterPoint(e, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(e.weight) / 2))
@@ -150,6 +129,7 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
           d.weight = parseInt(event.target.textContent);
         }
         event.target.textContent = d.weight;
+
         let rect = event.target.parentNode.parentNode.querySelector('rect');
         let forObj = event.target.parentNode;
         let path = event.target.parentNode.parentNode.querySelector('path');
@@ -160,13 +140,8 @@ function renderEdges(svgRef: React.RefObject<SVGSVGElement>, edges: Interface.Ed
         forObj.setAttribute("x", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[0] - rxSize(d.weight) / 2);
         forObj.setAttribute("y", calcCenterPoint(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS)[1] - constant.TEXT_EDGE_HEIGHT / 2);
         path.setAttribute("d", getLinePath(d, isDirected, constant.CURVE_OFFSET, constant.NODE_RADIUS));
-        //event.target.style.width = rxSize(d.weight);
-        
-        // обновляем данные
         console.log(d);
       });
-
-      
 
       svg.selectAll<SVGGElement, Interface.NodeFx>('g.node').raise();
     }
